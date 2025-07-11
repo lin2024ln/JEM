@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JEM Helpful Links</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --main-bg: #fff;
@@ -151,14 +150,6 @@
             font-weight: 600;
             margin: 0;
         }
-        .workspace-dashboard .links-grid {
-            margin-bottom: 30px;
-        }
-        .workspace-dashboard .section-title {
-            color: white;
-            -webkit-text-fill-color: white;
-            text-align: center;
-        }
         .draggable-section {
             cursor: move;
             position: relative;
@@ -166,6 +157,7 @@
         .draggable-section.dragging {
             opacity: 0.5;
             transform: scale(0.98);
+            z-index: 100;
         }
         .link-card.draggable {
             cursor: move;
@@ -173,6 +165,14 @@
         .link-card.dragging {
             opacity: 0.5;
             transform: scale(0.98);
+            z-index: 100;
+        }
+        .drag-placeholder {
+            background: rgba(52, 152, 219, 0.1);
+            border: 2px dashed var(--primary);
+            border-radius: 18px;
+            min-height: 260px;
+            margin: 16px 0;
         }
         .drag-note {
             font-size: 0.9rem;
@@ -234,7 +234,7 @@
             border-radius: 4px;
             font-size: 1rem;
         }
-        #saveDashboardBtn, #saveProjectBtn, #exportProjectsBtn {
+        #saveDashboardBtn, #saveProjectBtn {
             margin-top: 10px;
             display: block;
             margin-left: auto;
@@ -577,12 +577,9 @@
                         <button id="addProjectBtn" class="link-btn">
                             <i class="fas fa-plus"></i> Add Project
                         </button>
-                        <button id="exportProjectsBtn" class="link-btn">
-                            <i class="fas fa-file-export"></i> Export Projects
-                        </button>
                     </div>
                 </div>
-                <p class="drag-note">Drag sections or individual cards to reorder</p>
+                <p class="drag-note">Drag sections or cards to reorder, like in Monday.com</p>
                 <div id="workspaceDashboardContainer" class="workspace-dashboard"></div>
             </div>
         </div>
@@ -604,7 +601,7 @@
             <h4>Add New Project</h4>
             <div id="newProjectForm">
                 <label>
-                    Project Title
+                    Project Name
                     <input type="text" id="projectTitle" required>
                 </label>
                 <label>
@@ -612,10 +609,6 @@
                     <select id="projectLinks" multiple>
                         <!-- Populated dynamically -->
                     </select>
-                </label>
-                <label>
-                    Description
-                    <input type="text" id="projectDesc">
                 </label>
                 <label>
                     Icon
@@ -733,7 +726,6 @@
             const projectModal = document.getElementById('projectModal');
             const manageBtn = document.getElementById('manageDashboardBtn');
             const addProjectBtn = document.getElementById('addProjectBtn');
-            const exportBtn = document.getElementById('exportProjectsBtn');
             const manageCloseBtn = manageModal.querySelector('.close-btn');
             const projectCloseBtn = projectModal.querySelector('.close-btn');
             const saveBtn = document.getElementById('saveDashboardBtn');
@@ -764,7 +756,6 @@
 
             manageBtn.onclick = () => openManageModal();
             addProjectBtn.onclick = () => projectModal.style.display = 'block';
-            exportBtn.onclick = () => exportProjectsToCSV();
             manageCloseBtn.onclick = () => manageModal.style.display = 'none';
             projectCloseBtn.onclick = () => projectModal.style.display = 'none';
             saveBtn.onclick = () => saveDashboardSettings();
@@ -802,43 +793,23 @@
                 title: option.text.split(' (')[0],
                 icon: option.dataset.icon
             }));
-            const desc = document.getElementById('projectDesc').value;
             const icon = document.getElementById('projectIcon').value;
 
             if (!title || urls.length === 0) {
-                alert('Please fill in the project title and select at least one link');
+                alert('Please fill in the project name and select at least one link');
                 return;
             }
 
             const projects = JSON.parse(localStorage.getItem('userProjects') || '[]');
-            projects.push({ title, urls, desc, icon, category: 'public projects' });
+            projects.push({ title, urls, icon, category: 'public projects' });
             localStorage.setItem('userProjects', JSON.stringify(projects));
 
             document.getElementById('projectModal').style.display = 'none';
             document.getElementById('projectTitle').value = '';
             document.getElementById('projectLinks').selectedIndex = -1;
-            document.getElementById('projectDesc').value = '';
+            document.getElementById('projectIcon').value = 'fa-project-diagram';
             renderWorkspaceDashboard();
             updateProjectsSection();
-        }
-
-        function exportProjectsToCSV() {
-            const projects = JSON.parse(localStorage.getItem('userProjects') || '[]');
-            let csvContent = 'data:text/csv;charset=utf-8,Title,Links,Description,Icon\n';
-
-            projects.forEach(project => {
-                const links = project.urls.map(link => `${link.title}: ${link.url}`).join('; ');
-                const row = `"${project.title.replace(/"/g, '""')}","${links.replace(/"/g, '""')}","${(project.desc || '').replace(/"/g, '""')}","${project.icon}"\n`;
-                csvContent += row;
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement('a');
-            link.setAttribute('href', encodedUri);
-            link.setAttribute('download', 'projects_export.csv');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
         }
 
         function updateProjectsSection() {
@@ -846,13 +817,13 @@
             if (projectsGrid) {
                 projectsGrid.innerHTML = '';
                 const projects = JSON.parse(localStorage.getItem('userProjects') || '[]');
-                projects.forEach(project => {
-                    project.urls.forEach((link, index) => {
+                projects.forEach((project, projectIndex) => {
+                    project.urls.forEach((link, linkIndex) => {
                         projectsGrid.innerHTML += `
-                            <div class="link-card draggable" data-category="public projects">
+                            <div class="link-card draggable" data-category="public projects" data-project-index="${projectIndex}" data-link-index="${linkIndex}">
                                 <div class="link-icon"><i class="fas ${link.icon || project.icon}"></i></div>
-                                <div class="link-title">${project.title}${project.urls.length > 1 ? ` (${index + 1})` : ''}</div>
-                                <div class="link-desc">${project.desc || 'No description'}</div>
+                                <div class="link-title">${project.title}${project.urls.length > 1 ? ` (${linkIndex + 1})` : ''}</div>
+                                <div class="link-desc">Custom project link</div>
                                 <a class="link-btn" href="${link.url}" target="_blank" rel="noopener">
                                     <i class="fas fa-external-link-alt"></i> Visit ${link.title}
                                 </a>
@@ -861,12 +832,13 @@
                     });
                 });
             }
+            initDragAndDrop();
         }
 
         function renderWorkspaceDashboard() {
             const container = document.getElementById('workspaceDashboardContainer');
             container.innerHTML = '';
-            const savedSections = JSON.parse(localStorage.getItem('workspaceDashboardSections'));
+            const savedSections = JSON.parse(localStorage.getItem('workspaceDashboardSections') || '[]');
 
             if (savedSections.length === 0) {
                 container.innerHTML = `<p style="text-align: center;">Your workspace is empty. Click "Manage Sections" to add content.</p>`;
@@ -888,31 +860,70 @@
                     container.appendChild(sectionWrapper);
                 }
             });
-            updateProjectsSection();
+            initDragAndDrop();
         }
 
         function initDragAndDrop() {
-            const containers = document.querySelectorAll('#allContent .links-grid, #workspaceDashboardContainer');
+            const containers = document.querySelectorAll('.links-grid, #workspaceDashboardContainer');
             let draggedItem = null;
+            let placeholder = null;
 
             containers.forEach(container => {
                 container.addEventListener('dragstart', (e) => {
-                    if (e.target.classList.contains('draggable-section') || e.target.classList.contains('link-card')) {
-                        draggedItem = e.target;
-                        e.target.classList.add('dragging');
+                    const target = e.target.closest('.draggable-section, .link-card');
+                    if (target) {
+                        draggedItem = target;
+                        target.classList.add('dragging');
                         e.dataTransfer.setData('text/plain', '');
+                        setTimeout(() => {
+                            target.style.display = 'none';
+                            placeholder = document.createElement('div');
+                            placeholder.className = 'drag-placeholder';
+                            placeholder.style.height = target.offsetHeight + 'px';
+                            if (target.classList.contains('draggable-section')) {
+                                target.parentNode.insertBefore(placeholder, target.nextSibling);
+                            } else {
+                                target.parentNode.insertBefore(placeholder, target);
+                            }
+                        }, 0);
                     }
                 });
 
                 container.addEventListener('dragend', (e) => {
-                    if (e.target.classList.contains('draggable-section') || e.target.classList.contains('link-card')) {
-                        e.target.classList.remove('dragging');
+                    const target = e.target.closest('.draggable-section, .link-card');
+                    if (target) {
+                        target.classList.remove('dragging');
+                        target.style.display = '';
+                        if (placeholder) {
+                            placeholder.remove();
+                            placeholder = null;
+                        }
                         draggedItem = null;
                     }
                 });
 
                 container.addEventListener('dragover', (e) => {
                     e.preventDefault();
+                    const target = e.target.closest('.draggable-section, .link-card');
+                    const dropContainer = e.target.closest('.links-grid, #workspaceDashboardContainer');
+                    if (dropContainer && placeholder) {
+                        const allItems = Array.from(dropContainer.querySelectorAll('.draggable-section, .link-card'));
+                        const closestItem = allItems.find(item => {
+                            const rect = item.getBoundingClientRect();
+                            return e.clientY >= rect.top && e.clientY <= rect.bottom && item !== draggedItem;
+                        });
+                        if (closestItem) {
+                            const rect = closestItem.getBoundingClientRect();
+                            const isBefore = e.clientY < rect.top + rect.height / 2;
+                            if (isBefore) {
+                                dropContainer.insertBefore(placeholder, closestItem);
+                            } else {
+                                dropContainer.insertBefore(placeholder, closestItem.nextSibling);
+                            }
+                        } else {
+                            dropContainer.appendChild(placeholder);
+                        }
+                    }
                 });
 
                 container.addEventListener('drop', (e) => {
@@ -920,37 +931,74 @@
                     const dropTarget = e.target.closest('.draggable-section, .link-card');
                     const dropContainer = e.target.closest('.links-grid, #workspaceDashboardContainer');
 
-                    if (draggedItem && dropTarget && dropContainer) {
-                        if (draggedItem.classList.contains('draggable-section') && dropTarget.classList.contains('draggable-section')) {
-                            const allSections = Array.from(document.querySelectorAll('#workspaceDashboardContainer .draggable-section'));
-                            const draggedIndex = allSections.indexOf(draggedItem);
-                            const dropIndex = allSections.indexOf(dropTarget);
+                    if (!draggedItem || !dropContainer) return;
 
-                            if (draggedIndex < dropIndex) {
-                                dropContainer.insertBefore(draggedItem, dropTarget.nextSibling);
+                    if (draggedItem.classList.contains('draggable-section')) {
+                        const allSections = Array.from(document.querySelectorAll('#workspaceDashboardContainer .draggable-section'));
+                        const draggedIndex = allSections.indexOf(draggedItem);
+                        let dropIndex = dropTarget && dropTarget.classList.contains('draggable-section') ? allSections.indexOf(dropTarget) : allSections.length;
+
+                        const rect = dropTarget?.getBoundingClientRect();
+                        const isBefore = dropTarget && e.clientY < rect.top + rect.height / 2;
+                        if (dropTarget && !isBefore) dropIndex++;
+
+                        if (draggedIndex !== dropIndex && draggedIndex !== dropIndex - 1) {
+                            if (dropIndex >= allSections.length) {
+                                dropContainer.appendChild(draggedItem);
                             } else {
-                                dropContainer.insertBefore(draggedItem, dropTarget);
+                                dropContainer.insertBefore(draggedItem, allSections[dropIndex]);
                             }
 
-                            const savedSections = JSON.parse(localStorage.getItem('workspaceDashboardSections'));
+                            const savedSections = JSON.parse(localStorage.getItem('workspaceDashboardSections') || '[]');
                             const draggedSectionId = draggedItem.dataset.sectionId;
                             savedSections.splice(draggedIndex, 1);
-                            savedSections.splice(dropIndex, 0, draggedSectionId);
+                            savedSections.splice(dropIndex > draggedIndex ? dropIndex - 1 : dropIndex, 0, draggedSectionId);
                             localStorage.setItem('workspaceDashboardSections', JSON.stringify(savedSections));
-                        } else if (draggedItem.classList.contains('link-card') && dropContainer.classList.contains('links-grid')) {
-                            const allCards = Array.from(dropContainer.querySelectorAll('.link-card'));
-                            const dropIndex = dropTarget.classList.contains('link-card') ? allCards.indexOf(dropTarget) : allCards.length;
+                        }
+                    } else if (draggedItem.classList.contains('link-card') && dropContainer.classList.contains('links-grid')) {
+                        const allCards = Array.from(dropContainer.querySelectorAll('.link-card'));
+                        const dropIndex = dropTarget && dropTarget.classList.contains('link-card') ? allCards.indexOf(dropTarget) : allCards.length;
+                        const rect = dropTarget?.getBoundingClientRect();
+                        const isBefore = dropTarget && e.clientY < rect.top + rect.height / 2;
 
-                            if (dropTarget.classList.contains('link-card')) {
-                                if (allCards.indexOf(draggedItem) < dropIndex) {
-                                    dropContainer.insertBefore(draggedItem, dropTarget.nextSibling);
-                                } else {
-                                    dropContainer.insertBefore(draggedItem, dropTarget);
-                                }
+                        if (dropTarget && dropTarget.classList.contains('link-card')) {
+                            if (isBefore) {
+                                dropContainer.insertBefore(draggedItem, dropTarget);
                             } else {
-                                dropContainer.appendChild(draggedItem);
+                                dropContainer.insertBefore(draggedItem, dropTarget.nextSibling);
+                            }
+                        } else {
+                            dropContainer.appendChild(draggedItem);
+                        }
+
+                        if (dropContainer.dataset.sectionId === 'projects') {
+                            const projects = JSON.parse(localStorage.getItem('userProjects') || '[]');
+                            const draggedProjectIndex = parseInt(draggedItem.dataset.projectIndex);
+                            const draggedLinkIndex = parseInt(draggedItem.dataset.linkIndex);
+                            const dropProjectIndex = dropTarget && dropTarget.dataset.projectIndex ? parseInt(dropTarget.dataset.projectIndex) : null;
+                            const dropLinkIndex = dropTarget && dropTarget.dataset.linkIndex ? parseInt(dropTarget.dataset.linkIndex) : null;
+
+                            if (dropProjectIndex !== null && dropLinkIndex !== null) {
+                                const draggedLink = projects[draggedProjectIndex].urls[draggedLinkIndex];
+                                projects[draggedProjectIndex].urls.splice(draggedLinkIndex, 1);
+                                if (draggedProjectIndex === dropProjectIndex) {
+                                    projects[dropProjectIndex].urls.splice(isBefore ? dropLinkIndex : dropLinkIndex + 1, 0, draggedLink);
+                                } else {
+                                    projects[dropProjectIndex].urls.splice(isBefore ? dropLinkIndex : dropLinkIndex + 1, 0, draggedLink);
+                                    if (projects[draggedProjectIndex].urls.length === 0) {
+                                        projects.splice(draggedProjectIndex, 1);
+                                    }
+                                }
+                                localStorage.setItem('userProjects', JSON.stringify(projects));
+                                updateProjectsSection();
                             }
                         }
+                    }
+
+                    draggedItem.style.display = '';
+                    if (placeholder) {
+                        placeholder.remove();
+                        placeholder = null;
                     }
                 });
             });
