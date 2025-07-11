@@ -29,6 +29,7 @@
             margin: 0;
         }
         .header {
+            color:  #e0e0e0;
             padding: 10px 0;
             position: sticky;
             top: 0;
@@ -41,16 +42,18 @@
         }
         .header-logo {
             max-width: 50px;
+            color:  #00000;
             height: auto;
             filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
         }
         .hamburger {
             font-size: 1.5rem;
-            color: white;
+            color: black;
             cursor: pointer;
             padding: 10px;
             border-radius: 8px;
             transition: background 0.3s;
+            justify-content: flex-start;
         }
         .hamburger:hover {
             background: rgba(255, 255, 255, 0.2);
@@ -465,7 +468,7 @@
         @media (max-width: 600px) {
             .container { padding: 20px 4px 0 4px; }
             .section-title { font-size: 1.3rem; }
-            .header-logo { max-width: 120px; }
+            .header-logo { max-width: 60px; }
             .link-card { padding: 18px 8px 16px 8px; }
             .filter-buttons { gap: 6px; }
             .filter-btn { padding: 6px 10px; font-size: 0.85rem; }
