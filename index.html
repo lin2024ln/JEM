@@ -15,6 +15,8 @@
             --text: #222;
             --muted: #888;
             --border: #e0e0e0;
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         html { scroll-behavior: smooth; }
         body {
@@ -26,23 +28,80 @@
             text-align: center;
             margin: 0;
         }
-        .navbar {
-            background: #fff;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-            padding: 18px 0;
+        .header {
+            padding: 10px 0;
             position: sticky;
             top: 0;
             z-index: 10;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
         }
-        .nav-title {
-            font-size: 2.2rem;
-            font-weight: bold;
+        .header-logo {
+            max-width: 50px;
+            height: auto;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+        .hamburger {
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        .hamburger:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .side-menu {
+            display: none;
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--glass-shadow);
+            width: 250px;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 15;
+            padding: 20px;
+        }
+        .side-menu.active {
+            display: block;
+        }
+        .side-menu-category {
+            margin-bottom: 20px;
+        }
+        .side-menu-category h3 {
+            font-size: 1.2rem;
             color: var(--primary);
-            letter-spacing: 1px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
+            gap: 8px;
+        }
+        .side-menu-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.95rem;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        .side-menu-link:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+        .side-menu-link i {
+            font-size: 1.1rem;
+            color: var(--primary);
         }
         .container {
             max-width: 1200px;
@@ -54,27 +113,27 @@
             justify-content: center;
             gap: 4px;
             margin: 30px 0;
-            border-radius: 12px;
+            border-radius: 10px;
             overflow: hidden;
             background: var(--card-bg);
-            padding: 6px;
+            padding: 5px;
             border: 2px solid var(--border);
         }
         .main-tab {
             flex: 1;
-            max-width: 200px;
-            padding: 12px 24px;
+            max-width: 180px;
+            padding: 10px 20px;
             background: transparent;
             border: none;
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             color: var(--muted);
             transition: all 0.3s ease;
-            border-radius: 8px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         .main-tab.active {
             background: linear-gradient(45deg, var(--primary), var(--secondary));
@@ -100,40 +159,38 @@
         }
         .filter-buttons {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
             flex-wrap: wrap;
         }
         .filter-btn {
-            padding: 10px 20px;
-            border: 2px solid rgba(255,255,255,0.3);
-            background: rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
-            border-radius: 25px;
+            border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 500;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             backdrop-filter: blur(10px);
         }
         .filter-btn.active {
-            background: rgba(255,255,255,0.2);
-            border-color: rgba(255,255,255,0.6);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.6);
             transform: scale(1.05);
-            box-shadow: 0 4px 16px rgba(255,255,255,0.2);
+            box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2);
         }
         .filter-btn:hover {
-            background: rgba(255,255,255,0.2);
-            border-color: rgba(255,255,255,0.5);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
             transform: translateY(-2px);
         }
         .workspace-section {
             margin: 30px 0;
             padding: 32px;
-            background: linear-gradient(135deg, var(--secondary), var(--primary));
             border-radius: 16px;
-            color: white;
-            box-shadow: 0 8px 32px rgba(155, 89, 182, 0.2);
+            color: var(--text);
             text-align: left;
         }
         .workspace-header {
@@ -146,13 +203,14 @@
         }
         .workspace-title {
             font-size: 1.8rem;
-            color: white;
+            color: var(--text);
             font-weight: 600;
             margin: 0;
         }
         .draggable-section {
             cursor: move;
             position: relative;
+            margin: 20px 0;
         }
         .draggable-section.dragging {
             opacity: 0.5;
@@ -161,6 +219,7 @@
         }
         .link-card.draggable {
             cursor: move;
+            position: relative;
         }
         .link-card.dragging {
             opacity: 0.5;
@@ -173,6 +232,40 @@
             border-radius: 18px;
             min-height: 260px;
             margin: 16px 0;
+        }
+        .drag-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+        .section-drag-controls {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 10px 0;
+        }
+        .drag-arrow {
+            background: var(--glass-bg);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+            box-shadow: var(--glass-shadow);
+        }
+        .drag-arrow:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        .drag-arrow:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--muted);
+            cursor: not-allowed;
         }
         .drag-note {
             font-size: 0.9rem;
@@ -189,7 +282,7 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0,0,0,0.6);
+            background-color: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
         }
         .modal-content {
@@ -239,6 +332,9 @@
             display: block;
             margin-left: auto;
             margin-right: auto;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            border-radius: 6px;
         }
         .content-area { display: none; }
         .content-area.active { display: block; }
@@ -300,14 +396,14 @@
         .link-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 22px;
+            gap: 6px;
+            padding: 8px 16px;
             background: linear-gradient(45deg, var(--primary), var(--secondary));
             color: #fff;
             text-decoration: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 0.9rem;
             transition: all 0.3s;
             margin-top: auto;
             border: none;
@@ -316,6 +412,47 @@
         .link-btn:hover {
             background: linear-gradient(45deg, var(--secondary), var(--primary));
             transform: translateY(-2px) scale(1.04);
+        }
+        .browse-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 20px 0;
+            position: sticky;
+            top: 80px;
+            z-index: 5;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 8px;
+            box-shadow: var(--glass-shadow);
+        }
+        .browse-tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.3s ease;
+            border-radius: 16px;
+        }
+        .browse-tab.active {
+            background: rgba(255, 255, 255, 0.3);
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .browse-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--primary);
+        }
+        .iframe-container {
+            width: 100%;
+            height: calc(100vh - 200px);
+            border: none;
+            border-radius: 12px;
+            margin-top: 20px;
         }
         .footer {
             background: var(--card-bg);
@@ -328,27 +465,34 @@
         @media (max-width: 600px) {
             .container { padding: 20px 4px 0 4px; }
             .section-title { font-size: 1.3rem; }
-            .nav-title { font-size: 1.2rem; }
+            .header-logo { max-width: 120px; }
             .link-card { padding: 18px 8px 16px 8px; }
-            .filter-buttons { gap: 8px; }
-            .filter-btn { padding: 8px 12px; font-size: 0.9rem; }
-            .main-tabs { flex-direction: column; gap: 8px; }
-            .main-tab { max-width: none; }
+            .filter-buttons { gap: 6px; }
+            .filter-btn { padding: 6px 10px; font-size: 0.85rem; }
+            .main-tabs { flex-direction: column; gap: 6px; }
+            .main-tab { max-width: none; padding: 8px 16px; font-size: 0.9rem; }
+            .drag-controls { top: 5px; right: 5px; }
+            .drag-arrow { padding: 4px 8px; font-size: 0.8rem; }
+            .side-menu { width: 80%; left: 10%; top: 100px; }
+            .browse-tabs { flex-direction: column; gap: 6px; padding: 6px; }
+            .browse-tab { padding: 8px 16px; font-size: 0.9rem; }
+            .iframe-container { height: calc(100vh - 250px); }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-title">
-            <i class="fas fa-link"></i>
-            JEM Helpful Links
-        </div>
-    </nav>
+    <header class="header">
+        <i class="fas fa-bars hamburger" onclick="toggleSideMenu()"></i>
+        <img src="https://jemcentral.org/wp-content/uploads/2018/11/jem-logo.gif" alt="JEM Logo" class="header-logo">
+    </header>
+    <div class="side-menu" id="sideMenu">
+        <!-- Dynamically populated -->
+    </div>
     <div class="container">
         <div class="main-tabs">
             <button class="main-tab active" onclick="switchMainTab('all')"><i class="fas fa-list"></i> All Links</button>
             <button class="main-tab" onclick="switchMainTab('workspace')"><i class="fas fa-briefcase"></i> Workspace</button>
-            <a class="main-tab" href="?filter=public" target="_blank" rel="noopener"><i class="fas fa-globe"></i> Display on Web</a>
+            <button class="main-tab" onclick="switchMainTab('browse')"><i class="fas fa-globe"></i> Browse</button>
         </div>
         <div id="allContent" class="content-area active">
             <div class="filter-section">
@@ -356,6 +500,7 @@
                 <div class="filter-buttons">
                     <button class="filter-btn active" onclick="filterLinks('all')">All</button>
                     <button class="filter-btn" onclick="filterLinks('public')">Public</button>
+                    <button class="filter-btn" onclick="filterLinks('server')">Server</button>
                     <button class="filter-btn" onclick="filterLinks('video')">Video</button>
                     <button class="filter-btn" onclick="filterLinks('media')">Media</button>
                     <button class="filter-btn" onclick="filterLinks('text')">Text</button>
@@ -579,9 +724,17 @@
                         </button>
                     </div>
                 </div>
-                <p class="drag-note">Drag sections or cards to reorder, like in Monday.com</p>
+                <p class="drag-note">Drag sections/cards or use arrows to reorder, like in Monday.com</p>
                 <div id="workspaceDashboardContainer" class="workspace-dashboard"></div>
             </div>
+        </div>
+        <div id="browseContent" class="content-area">
+            <div class="browse-tabs">
+                <button class="browse-tab active" onclick="switchBrowseTab('jemtv')"><i class="fas fa-video"></i> JEM.tv</button>
+                <button class="browse-tab" onclick="switchBrowseTab('photos')"><i class="fas fa-image"></i> JEM Photos</button>
+                <button class="browse-tab" onclick="switchBrowseTab('ashreinu')"><i class="fas fa-headphones"></i> Ashreinu</button>
+            </div>
+            <iframe id="browseIframe" class="iframe-container" src="https://videos.jem.tv" frameborder="0"></iframe>
         </div>
         <div class="footer">
             © 2025 Jewish Educational Media Inc. • jem@jemedia.org • 718-774-6000
@@ -649,14 +802,56 @@
             { title: 'Dedications', url: 'https://dedication.jemedia.org/category/gnmc', icon: 'fa-gift', category: 'public management' }
         ];
 
+        const ALL_SECTIONS = [
+            { title: 'Video', id: 'video', icon: 'fa-video' },
+            { title: 'Audio', id: 'audio', icon: 'fa-headphones' },
+            { title: 'Photos', id: 'photo', icon: 'fa-image' },
+            { title: 'Text', id: 'text', icon: 'fa-file-alt' },
+            { title: 'AI Tools', id: 'ai', icon: 'fa-robot' },
+            { title: 'Tools', id: 'tools', icon: 'fa-tools' },
+            { title: 'Outside Tools', id: 'outside', icon: 'fa-external-link-alt' },
+            { title: 'Management', id: 'management', icon: 'fa-folder-open' },
+            { title: 'Projects', id: 'projects', icon: 'fa-project-diagram' }
+        ];
+
         document.addEventListener('DOMContentLoaded', () => {
+            initSideMenu();
             initWorkspaceDashboard();
             const urlParams = new URLSearchParams(window.location.search);
             const filter = urlParams.get('filter');
             filterLinks(filter === 'public' ? 'public' : 'all');
             updateProjectsSection();
             initDragAndDrop();
+            updateArrowStates();
         });
+
+        function initSideMenu() {
+            const sideMenu = document.getElementById('sideMenu');
+            sideMenu.innerHTML = '';
+            ALL_SECTIONS.forEach(section => {
+                const sectionLinks = ALL_LINKS.filter(link => link.category.includes(section.id));
+                if (sectionLinks.length > 0) {
+                    let sectionHtml = `
+                        <div class="side-menu-category">
+                            <h3><i class="fas ${section.icon}"></i> ${section.title}</h3>
+                    `;
+                    sectionLinks.forEach(link => {
+                        sectionHtml += `
+                            <a href="${link.url}" class="side-menu-link" target="_blank" rel="noopener">
+                                <i class="fas ${link.icon}"></i> ${link.title}
+                            </a>
+                        `;
+                    });
+                    sectionHtml += `</div>`;
+                    sideMenu.innerHTML += sectionHtml;
+                }
+            });
+        }
+
+        function toggleSideMenu() {
+            const sideMenu = document.getElementById('sideMenu');
+            sideMenu.classList.toggle('active');
+        }
 
         function switchMainTab(tab) {
             const tabs = document.querySelectorAll('.main-tab');
@@ -665,7 +860,23 @@
             contents.forEach(c => c.classList.remove('active'));
             const activeTab = document.querySelector(`[onclick="switchMainTab('${tab}')"]`);
             if (activeTab) activeTab.classList.add('active');
-            document.getElementById(tab === 'all' ? 'allContent' : 'workspaceContent').classList.add('active');
+            document.getElementById(tab === 'all' ? 'allContent' : tab === 'workspace' ? 'workspaceContent' : 'browseContent').classList.add('active');
+            updateArrowStates();
+        }
+
+        function switchBrowseTab(tab) {
+            const tabs = document.querySelectorAll('.browse-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            const activeTab = document.querySelector(`[onclick="switchBrowseTab('${tab}')"]`);
+            if (activeTab) activeTab.classList.add('active');
+
+            const iframe = document.getElementById('browseIframe');
+            const urls = {
+                jemtv: 'https://videos.jem.tv',
+                photos: 'https://photos.jemedia.org/search',
+                ashreinu: 'https://ashreinu.app'
+            };
+            iframe.src = urls[tab];
         }
 
         function filterLinks(category) {
@@ -684,7 +895,9 @@
                 if (section.classList.contains('links-grid')) {
                     sectionCards.forEach(card => {
                         const cardCategory = card.dataset.category;
-                        if (category === 'all' || (cardCategory && cardCategory.includes(category))) {
+                        if (category === 'all' || 
+                            (category === 'server' && cardCategory.includes('server')) ||
+                            (cardCategory && cardCategory.includes(category))) {
                             card.classList.remove('hidden');
                             hasVisibleCard = true;
                         } else {
@@ -699,19 +912,8 @@
                     section.classList.toggle('hidden', !hasVisibleCard);
                 }
             });
+            updateArrowStates();
         }
-
-        const ALL_SECTIONS = [
-            { title: 'Video', id: 'video' },
-            { title: 'Audio', id: 'audio' },
-            { title: 'Photos', id: 'photo' },
-            { title: 'Text', id: 'text' },
-            { title: 'AI Tools', id: 'ai' },
-            { title: 'Tools', id: 'tools' },
-            { title: 'Outside Tools', id: 'outside' },
-            { title: 'Management', id: 'management' },
-            { title: 'Projects', id: 'projects' }
-        ];
 
         function initWorkspaceDashboard() {
             if (localStorage.getItem('workspaceDashboardSections') === null) {
@@ -763,6 +965,9 @@
             window.onclick = (event) => {
                 if (event.target == manageModal) manageModal.style.display = 'none';
                 if (event.target == projectModal) projectModal.style.display = 'none';
+                if (!event.target.closest('.side-menu') && !event.target.closest('.hamburger')) {
+                    document.getElementById('sideMenu').classList.remove('active');
+                }
             };
 
             renderWorkspaceDashboard();
@@ -784,6 +989,7 @@
             localStorage.setItem('workspaceDashboardSections', JSON.stringify(selectedSections));
             document.getElementById('manageModal').style.display = 'none';
             renderWorkspaceDashboard();
+            updateArrowStates();
         }
 
         function saveNewProject() {
@@ -821,6 +1027,10 @@
                     project.urls.forEach((link, linkIndex) => {
                         projectsGrid.innerHTML += `
                             <div class="link-card draggable" data-category="public projects" data-project-index="${projectIndex}" data-link-index="${linkIndex}">
+                                <div class="drag-controls">
+                                    <button class="drag-arrow" onclick="moveItem(this, 'left')"><i class="fas fa-arrow-left"></i></button>
+                                    <button class="drag-arrow" onclick="moveItem(this, 'right')"><i class="fas fa-arrow-right"></i></button>
+                                </div>
                                 <div class="link-icon"><i class="fas ${link.icon || project.icon}"></i></div>
                                 <div class="link-title">${project.title}${project.urls.length > 1 ? ` (${linkIndex + 1})` : ''}</div>
                                 <div class="link-desc">Custom project link</div>
@@ -833,6 +1043,7 @@
                 });
             }
             initDragAndDrop();
+            updateArrowStates();
         }
 
         function renderWorkspaceDashboard() {
@@ -845,7 +1056,7 @@
                 return;
             }
 
-            savedSections.forEach(sectionId => {
+            savedSections.forEach((sectionId, index) => {
                 const originalTitle = document.querySelector(`#allContent h2[data-section-id="${sectionId}"]`);
                 if (originalTitle) {
                     const originalGrid = originalTitle.nextElementSibling;
@@ -853,14 +1064,108 @@
                     sectionWrapper.className = 'draggable-section';
                     sectionWrapper.dataset.sectionId = sectionId;
                     sectionWrapper.draggable = true;
+                    sectionWrapper.innerHTML = `
+                        <div class="section-drag-controls">
+                            <button class="drag-arrow" onclick="moveItem(this, 'up')"><i class="fas fa-arrow-up"></i></button>
+                            <button class="drag-arrow" onclick="moveItem(this, 'down')"><i class="fas fa-arrow-down"></i></button>
+                        </div>
+                    `;
                     const clonedTitle = originalTitle.cloneNode(true);
                     const clonedGrid = originalGrid.cloneNode(true);
+                    clonedGrid.querySelectorAll('.link-card').forEach(card => {
+                        const controls = document.createElement('div');
+                        controls.className = 'drag-controls';
+                        controls.innerHTML = `
+                            <button class="drag-arrow" onclick="moveItem(this, 'left')"><i class="fas fa-arrow-left"></i></button>
+                            <button class="drag-arrow" onclick="moveItem(this, 'right')"><i class="fas fa-arrow-right"></i></button>
+                        `;
+                        card.insertBefore(controls, card.firstChild);
+                    });
                     sectionWrapper.appendChild(clonedTitle);
                     sectionWrapper.appendChild(clonedGrid);
                     container.appendChild(sectionWrapper);
                 }
             });
             initDragAndDrop();
+            updateArrowStates();
+        }
+
+        function updateArrowStates() {
+            const workspaceContainer = document.getElementById('workspaceDashboardContainer');
+            const sections = Array.from(workspaceContainer.querySelectorAll('.draggable-section'));
+            sections.forEach((section, index) => {
+                const upArrow = section.querySelector('.section-drag-controls .drag-arrow[onclick*="up"]');
+                const downArrow = section.querySelector('.section-drag-controls .drag-arrow[onclick*="down"]');
+                if (upArrow) upArrow.disabled = index === 0;
+                if (downArrow) downArrow.disabled = index === sections.length - 1;
+
+                const cards = Array.from(section.querySelectorAll('.link-card'));
+                cards.forEach((card, cardIndex) => {
+                    const leftArrow = card.querySelector('.drag-controls .drag-arrow[onclick*="left"]');
+                    const rightArrow = card.querySelector('.drag-controls .drag-arrow[onclick*="right"]');
+                    if (leftArrow) leftArrow.disabled = cardIndex === 0;
+                    if (rightArrow) rightArrow.disabled = cardIndex === cards.length - 1;
+                });
+            });
+
+            const projectsGrid = document.querySelector('.links-grid[data-section-id="projects"]');
+            if (projectsGrid) {
+                const projectCards = Array.from(projectsGrid.querySelectorAll('.link-card'));
+                projectCards.forEach((card, cardIndex) => {
+                    const leftArrow = card.querySelector('.drag-controls .drag-arrow[onclick*="left"]');
+                    const rightArrow = card.querySelector('.drag-controls .drag-arrow[onclick*="right"]');
+                    if (leftArrow) leftArrow.disabled = cardIndex === 0;
+                    if (rightArrow) rightArrow.disabled = cardIndex === projectCards.length - 1;
+                });
+            }
+        }
+
+        function moveItem(button, direction) {
+            const item = button.closest('.draggable-section, .link-card');
+            const container = item.closest('.links-grid, #workspaceDashboardContainer');
+            const items = Array.from(container.querySelectorAll('.draggable-section, .link-card'));
+            const index = items.indexOf(item);
+
+            if (item.classList.contains('draggable-section')) {
+                if (direction === 'up' && index > 0) {
+                    container.insertBefore(item, items[index - 1]);
+                } else if (direction === 'down' && index < items.length - 1) {
+                    container.insertBefore(item, items[index + 1].nextSibling);
+                } else {
+                    return;
+                }
+                const savedSections = JSON.parse(localStorage.getItem('workspaceDashboardSections') || '[]');
+                const sectionId = item.dataset.sectionId;
+                const newIndex = direction === 'up' ? index - 1 : index + 1;
+                savedSections.splice(index, 1);
+                savedSections.splice(newIndex, 0, sectionId);
+                localStorage.setItem('workspaceDashboardSections', JSON.stringify(savedSections));
+            } else if (item.classList.contains('link-card')) {
+                const sectionGrid = item.closest('.links-grid');
+                const cards = Array.from(sectionGrid.querySelectorAll('.link-card'));
+                const cardIndex = cards.indexOf(item);
+                if (direction === 'left' && cardIndex > 0) {
+                    sectionGrid.insertBefore(item, cards[cardIndex - 1]);
+                } else if (direction === 'right' && cardIndex < cards.length - 1) {
+                    sectionGrid.insertBefore(item, cards[cardIndex + 1].nextSibling);
+                } else {
+                    return;
+                }
+
+                if (sectionGrid.dataset.sectionId === 'projects') {
+                    const projects = JSON.parse(localStorage.getItem('userProjects') || '[]');
+                    const projectIndex = parseInt(item.dataset.projectIndex);
+                    const linkIndex = parseInt(item.dataset.linkIndex);
+                    const link = projects[projectIndex].urls[linkIndex];
+                    projects[projectIndex].urls.splice(linkIndex, 1);
+                    const newLinkIndex = direction === 'left' ? linkIndex - 1 : linkIndex + 1;
+                    projects[projectIndex].urls.splice(newLinkIndex, 0, link);
+                    localStorage.setItem('userProjects', JSON.stringify(projects));
+                    updateProjectsSection();
+                }
+            }
+
+            updateArrowStates();
         }
 
         function initDragAndDrop() {
@@ -900,6 +1205,7 @@
                         }
                         draggedItem = null;
                     }
+                    updateArrowStates();
                 });
 
                 container.addEventListener('dragover', (e) => {
@@ -1000,6 +1306,7 @@
                         placeholder.remove();
                         placeholder = null;
                     }
+                    updateArrowStates();
                 });
             });
         }
