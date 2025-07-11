@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEM Helpful Links</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --main-bg: #fff;
+            --card-bg: #f7f8fa;
+            --primary: #3498db;
+            --secondary: #9b59b6;
+            --accent: #ffd700;
+            --text: #222;
+            --muted: #888;
+            --border: #e0e0e0;
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: var(--main-bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            text-align: center;
+            margin: 0;
+        }
+        .navbar {
+            background: #fff;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            padding: 18px 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .nav-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 16px 0 16px;
+        }
+        .main-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin: 30px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--card-bg);
+            padding: 6px;
+            border: 2px solid var(--border);
+        }
+        .main-tab {
+            flex: 1;
+            max-width: 200px;
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--muted);
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .main-tab.active {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+        }
+        .main-tab:hover:not(.active) {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--primary);
+        }
+        .filter-section {
+            margin: 30px 0;
+            padding: 24px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(52, 152, 219, 0.2);
+        }
+        .filter-title {
+            color: white;
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+            backdrop-filter: blur(10px);
+        }
+        .filter-btn.active {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.6);
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(255,255,255,0.2);
+        }
+        .filter-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.5);
+            transform: translateY(-2px);
+        }
+        .workspace-section {
+            margin: 30px 0;
+            padding: 32px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            border-radius: 16px;
+            color: white;
+            box-shadow: 0 8px 32px rgba(155, 89, 182, 0.2);
+            text-align: left;
+        }
+        .workspace-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .workspace-title {
+            font-size: 1.8rem;
+            color: white;
+            font-weight: 600;
+            margin: 0;
+        }
+        .workspace-dashboard .links-grid {
+            margin-bottom: 30px;
+        }
+        .workspace-dashboard .section-title {
+            color: white;
+            -webkit-text-fill-color: white;
+            text-align: center;
+        }
+        .draggable-section {
+            cursor: move;
+            position: relative;
+        }
+        .draggable-section.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+        }
+        .link-card.draggable {
+            cursor: move;
+        }
+        .link-card.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+        }
+        .drag-note {
+            font-size: 0.9rem;
+            color: var(--muted);
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 20;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 24px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 12px;
+            position: relative;
+            color: var(--text);
+        }
+        .close-btn {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-btn:hover, .close-btn:focus { color: black; }
+        #sectionCheckboxes, #newProjectForm {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin: 20px 0;
+        }
+        #sectionCheckboxes label, #newProjectForm label {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 1rem;
+        }
+        #newProjectForm select[multiple] {
+            height: 100px;
+        }
+        #newProjectForm input, #newProjectForm select {
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        #saveDashboardBtn, #saveProjectBtn, #exportProjectsBtn {
+            margin-top: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .content-area { display: none; }
+        .content-area.active { display: block; }
+        .section-title {
+            font-size: 2rem;
+            margin: 40px 0 24px 0;
+            background: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .section-title.hidden, .links-grid.hidden { display: none; }
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 32px;
+            margin-bottom: 60px;
+        }
+        .link-card {
+            background: var(--card-bg);
+            border-radius: 18px;
+            box-shadow: 0 4px 18px rgba(52, 152, 219, 0.07);
+            border: 1.5px solid var(--border);
+            padding: 32px 24px 24px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s;
+            min-height: 260px;
+            text-align: center;
+        }
+        .link-card:hover {
+            box-shadow: 0 8px 32px rgba(52, 152, 219, 0.13);
+            border-color: var(--primary);
+            transform: translateY(-4px) scale(1.01);
+        }
+        .link-card.hidden { display: none; }
+        .link-icon {
+            font-size: 2.8rem;
+            margin-bottom: 18px;
+            color: var(--primary);
+            background: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .link-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        .link-desc {
+            color: var(--muted);
+            font-size: 1.05rem;
+            margin-bottom: 18px;
+            min-height: 40px;
+        }
+        .link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s;
+            margin-top: auto;
+            border: none;
+            cursor: pointer;
+        }
+        .link-btn:hover {
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            transform: translateY(-2px) scale(1.04);
+        }
+        .footer {
+            background: var(--card-bg);
+            color: var(--muted);
+            font-size: 1rem;
+            padding: 32px 0 18px 0;
+            border-top: 1px solid var(--border);
+            margin-top: 60px;
+        }
+        @media (max-width: 600px) {
+            .container { padding: 20px 4px 0 4px; }
+            .section-title { font-size: 1.3rem; }
+            .nav-title { font-size: 1.2rem; }
+            .link-card { padding: 18px 8px 16px 8px; }
+            .filter-buttons { gap: 8px; }
+            .filter-btn { padding: 8px 12px; font-size: 0.9rem; }
+            .main-tabs { flex-direction: column; gap: 8px; }
+            .main-tab { max-width: none; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-title">
+            <i class="fas fa-link"></i>
+            JEM Helpful Links
+        </div>
+    </nav>
+    <div class="container">
+        <div class="main-tabs">
+            <button class="main-tab active" onclick="switchMainTab('all')"><i class="fas fa-list"></i> All Links</button>
+            <button class="main-tab" onclick="switchMainTab('workspace')"><i class="fas fa-briefcase"></i> Workspace</button>
+            <a class="main-tab" href="?filter=public" target="_blank" rel="noopener"><i class="fas fa-globe"></i> Display on Web</a>
+        </div>
+        <div id="allContent" class="content-area active">
+            <div class="filter-section">
+                <h3 class="filter-title">Filter Links</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterLinks('all')">All</button>
+                    <button class="filter-btn" onclick="filterLinks('public')">Public</button>
+                    <button class="filter-btn" onclick="filterLinks('video')">Video</button>
+                    <button class="filter-btn" onclick="filterLinks('media')">Media</button>
+                    <button class="filter-btn" onclick="filterLinks('text')">Text</button>
+                    <button class="filter-btn" onclick="filterLinks('ai')">AI Tools</button>
+                    <button class="filter-btn" onclick="filterLinks('tools')">Tools</button>
+                </div>
+            </div>
+            <h2 class="section-title" data-section-id="video"><i class="fas fa-video"></i> Video</h2>
+            <div class="links-grid" data-section-id="video">
+                <div class="link-card draggable" data-category="public video">
+                    <div class="link-icon"><i class="fas fa-video"></i></div>
+                    <div class="link-title">jem.tv</div>
+                    <div class="link-desc">Main site, should usually have the best experience</div>
+                    <a class="link-btn" href="https://videos.jem.tv" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Visit jem.tv
+                    </a>
+                </div>
+                <div class="link-card draggable" data-category="server video">
+                    <div class="link-icon"><i class="fas fa-server"></i></div>
+                    <div class="link-title">VMS</div>
+                    <div class="link-desc">Archive for all videos</div>
+                    <a class="link-btn" href="https://vms.jemedia.com" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Visit VMS
+                    </a>
+                </div>
+                <div class="link-card draggable" data-category="public video">
+                    <div class="link-icon"><i class="fas fa-star"></i></div>
+                    <div class="link-title">Old LT Chabadorg</div>
+                    <div class="link-desc">Legacy LT programs not yet on jem.tv</div>
+                    <a class="link-btn" href="https://chabad.org/lt" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Visit Chabad.org
+                    </a>
+                </div>
+            </div>
+            <h2 class="section-title" data-section-id="audio"><i class="fas fa-headphones"></i> Audio</h2>
+            <div class="links-grid" data-section-id="audio">
+                <div class="link-card draggable" data-category="public media audio">
+                    <div class="link-icon"><i class="fas fa-headphones"></i></div>
+                    <div class="link-title">Ashreinu</div>
+                    <div class="link-desc">Audio events and resources</div>
+                    <a class="link-btn" href="https://ashreinu.app/events" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Visit Ashreinu
+                    </a>
+                </div>
+                <div class="link-card draggable" data-category="server media audio">
+                    <div class="link-icon"><i class="fas fa-music"></i></div>
+                    <div class="link-title">AMS</div>
+                    <div class="link-desc">Audio management system</div>
+                    <a class="link-btn" href="https://ams.office.jemedia.org" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Visit AMS
+                    </a>
+                </div>
+            </div>
+            <h2 class="section-title" data-section-id="photo"><i class="fas fa-image"></i> Photos</h2>
+            <div class="links-grid" data-section-id="photo">
+                <div class="link-card draggable" data-category="public media photo">
+                    <div class="link-icon"><i class="fas fa-image"></i></div>
+                    <div class="link-title">JEM Photos</div>
+                    <div class="link-desc">Photo archive and search</div>
+                    <a class="link-btn" href="https://photos.jemedia.org" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Visit JEM Photos
+                    </a>
+                </div>
+                <div class="link-card draggable" data-category="server media photo">
+                    <div class="link-icon"><i class="fas fa-portrait"></i></div>
+                    <div class="link-title">Rebbephoto</div>
+                    <div class="link-desc">Rebbe photo archive</div>
+                    <a class="link-btn" href="https://remote.rebbephoto.com" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Visit Rebbephoto
+                    </a>
+                </div>
+            </div>
+            <h2 class="section-title" data-section-id="text"><i class="fas fa-file-alt"></i> Text</h2>
+            <div class="links-grid" data-section-id="text">
+                <div class="link-card draggable" data-category="public text">
+                    <div class="link-icon"><i class="fas fa-file-alt"></i></div>
+                    <div class="link-title">HMS En Jem.tv</div>
+                    <div class="link-desc">English My Encounter stories</div>
+                    <a class="link-btn" href="https://videos.jem.tv/hms" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Visit HMS
+                    </a>
+                </div>
+                <div class="link-card draggable" data-category="public text">
+                    <div class="link-icon"><i class="fas fa-language"></i></div>
+                    <div class="link-title">HMS Heb Jem.tv</div>
+                    <div class="link-desc">Hebrew My Encounter stories - Coming soon</div>
+                    <a class="link-btn" href="https://videos.jem.tv/hms/he" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Visit HMS Hebrew
+                    </a>
+                </div>
+            </div>
+            <h2 class="section-title" data-section-id="ai"><i class="fas fa-robot"></i> AI Tools</h2>
+            <div class="links-grid" data-section-id="ai">
+                <div class="link-card draggable" data-category="public ai">
+                    <div class="link-icon"><i class="fas fa-robot"></i></div>
+                    <div class="link-title">JEMai</div>
+                    <div class="link-desc">AI-powered video search and more</div>
+                    <a class="link-btn" href="https://videos.jem.tv/jemai" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Try JEMai
+                    </a>
+                </div>
+                <div class="link-card draggable" data-category="public ai">
+                    <div class="link-icon"><i class="fas fa-brain"></i></div>
+                    <div class="link-title">JEMai V2</div>
+                    <div class="link-desc">Enhanced AI search capabilities</div>
+                    <a class="link-btn" href="https://videos.jem.tv/jemai?version=2" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Try JEMai V2
+                    </a>
+                </div>
+                <div class="link-card draggable" data-category="public ai">
+                    <div class="link-icon"><i class="fas fa-comments"></i></div>
+                    <div class="link-title">JEMai V3</div>
+                    <div class="link-desc">Claude Chat integration</div>
+                    <a class="link-btn" href="https://claude.ai" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Claude Chat
+                    </a>
+                </div>
+            </div>
+            <h2 class="section-title" data-section-id="tools"><i class="fas fa-tools"></i> Tools</h2>
+            <div class="links-grid" data-section-id="tools">
+                <div class="link-card draggable" data-category="public tools">
+                    <div class="link-icon"><i class="fas fa-id-card"></i></div>
+                    <div class="link-title">Serial Number POC</div>
+                    <div class="link-desc">Find photos by serial number</div>
+                    <a class="link-btn" href="https://rebbephoto.com/serial-number-poc" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Serial Number Tool
+                    </a>
+                </div>
+                <div class="link-card draggable" data-category="public tools">
+                    <div class="link-icon"><i class="fas fa-file-csv"></i></div>
+                    <div class="link-title">Generate CSV</div>
+                    <div class="link-desc">CSV generation tool</div>
+                    <a class="link-btn" href="https://jemcentral.org/test/jsonCsv.html" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Generate CSV
+                    </a>
+                </div>
+                <div class="link-card draggable" data-category="public tools">
+                    <div class="link-icon"><i class="fas fa-tags"></i></div>
+                    <div class="link-title">Tagging Tool</div>
+                    <div class="link-desc">Tag and organize media content</div>
+                    <a class="link-btn" href="https://jem-tagging.web.app" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Open Tagging Tool
+                    </a>
+                </div>
+                <div class="link-card draggable" data-category="server tools">
+                    <div class="link-icon"><i class="fas fa-signature"></i></div>
+                    <div class="link-title">Sign URL</div>
+                    <div class="link-desc">URL signing tool</div>
+                    <a class="link-btn" href="https://ccdb-admin-prod.firebaseapp.com/sign-url" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Sign URL
+                    </a>
+                </div>
+                <div class="link-card draggable" data-category="server media tools">
+                    <div class="link-icon"><i class="fas fa-user-friends"></i></div>
+                    <div class="link-title">Search Faces</div>
+                    <div class="link-desc">Face recognition and search in JEM archives</div>
+                    <a class="link-btn" href="https://ccdb.jemedia.com/migration/face-recognition/search" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Search Faces
+                    </a>
+                </div>
+            </div>
+            <h2 class="section-title" data-section-id="outside"><i class="fas fa-external-link-alt"></i> Outside Tools</h2>
+            <div class="links-grid" data-section-id="outside">
+                <div class="link-card draggable" data-category="public outside">
+                    <div class="link-icon"><i class="fas fa-clock"></i></div>
+                    <div class="link-title">Clockin</div>
+                    <div class="link-desc">Time tracking for projects</div>
+                    <a class="link-btn" href="https://app.clockify.me" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Open Clockify
+                    </a>
+                </div>
+            </div>
+            <h2 class="section-title" data-section-id="management"><i class="fas fa-folder-open"></i> Management</h2>
+            <div class="links-grid" data-section-id="management">
+                <div class="link-card draggable" data-category="server management">
+                    <div class="link-icon"><i class="fas fa-folder-open"></i></div>
+                    <div class="link-title">Content Hub (Notion)</div>
+                    <div class="link-desc">Centralized Notion workspace for JEM</div>
+                    <a class="link-btn" href="https://www.notion.so/jemedia/c027df7ff28443da92c14155172553e2?v=44b085f32e784854b6f02ac8bb0f7720&pvs=13" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Open Content Hub
+                    </a>
+                </div>
+                <div class="link-card draggable" data-category="server management">
+                    <div class="link-icon"><i class="fas fa-book"></i></div>
+                    <div class="link-title">Knowledgebase (Notion)</div>
+                    <div class="link-desc">JEM internal knowledge base</div>
+                    <a class="link-btn" href="https://www.notion.so/jemedia/Knowledge-Base-d6ae2f07c1214a5e873f57357505e45c" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> Open Knowledgebase
+                    </a>
+                </div>
+                <div class="link-card draggable" data-category="server management">
+                    <div class="link-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <div class="link-title">GNMC Calendar</div>
+                    <div class="link-desc">Project and event calendar</div>
+                    <a class="link-btn" href="https://gnmc.office.jemedia.org/calendar" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> View Calendar
+                    </a>
+                </div>
+                <div class="link-card draggable" data-category="public management">
+                    <div class="link-icon"><i class="fas fa-gift"></i></div>
+                    <div class="link-title">Dedications</div>
+                    <div class="link-desc">Dedication opportunities and info</div>
+                    <a class="link-btn" href="https://dedication.jemedia.org/category/gnmc" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> View Dedications
+                    </a>
+                </div>
+            </div>
+            <h2 class="section-title" data-section-id="projects"><i class="fas fa-project-diagram"></i> Projects</h2>
+            <div class="links-grid" data-section-id="projects"></div>
+        </div>
+        <div id="workspaceContent" class="content-area">
+            <div class="workspace-section">
+                <div class="workspace-header">
+                    <h3 class="workspace-title">Workspace</h3>
+                    <div>
+                        <button id="manageDashboardBtn" class="link-btn">
+                            <i class="fas fa-cog"></i> Manage Sections
+                        </button>
+                        <button id="addProjectBtn" class="link-btn">
+                            <i class="fas fa-plus"></i> Add Project
+                        </button>
+                        <button id="exportProjectsBtn" class="link-btn">
+                            <i class="fas fa-file-export"></i> Export Projects
+                        </button>
+                    </div>
+                </div>
+                <p class="drag-note">Drag sections or individual cards to reorder</p>
+                <div id="workspaceDashboardContainer" class="workspace-dashboard"></div>
+            </div>
+        </div>
+        <div class="footer">
+            © 2025 Jewish Educational Media Inc. • jem@jemedia.org • 718-774-6000
+        </div>
+    </div>
+    <div id="manageModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">×</span>
+            <h4>Select sections for your workspace</h4>
+            <div id="sectionCheckboxes"></div>
+            <button id="saveDashboardBtn" class="link-btn">Save Preferences</button>
+        </div>
+    </div>
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">×</span>
+            <h4>Add New Project</h4>
+            <div id="newProjectForm">
+                <label>
+                    Project Title
+                    <input type="text" id="projectTitle" required>
+                </label>
+                <label>
+                    Project Links
+                    <select id="projectLinks" multiple>
+                        <!-- Populated dynamically -->
+                    </select>
+                </label>
+                <label>
+                    Description
+                    <input type="text" id="projectDesc">
+                </label>
+                <label>
+                    Icon
+                    <select id="projectIcon">
+                        <option value="fa-project-diagram">Project Diagram</option>
+                        <option value="fa-folder">Folder</option>
+                        <option value="fa-file">File</option>
+                        <option value="fa-link">Link</option>
+                    </select>
+                </label>
+            </div>
+            <button id="saveProjectBtn" class="link-btn">Save Project</button>
+        </div>
+    </div>
+    <script>
+        const ALL_LINKS = [
+            { title: 'jem.tv', url: 'https://videos.jem.tv', icon: 'fa-video', category: 'public video' },
+            { title: 'VMS', url: 'https://vms.jemedia.com', icon: 'fa-server', category: 'server video' },
+            { title: 'Old LT Chabadorg', url: 'https://chabad.org/lt', icon: 'fa-star', category: 'public video' },
+            { title: 'Ashreinu', url: 'https://ashreinu.app/events', icon: 'fa-headphones', category: 'public media audio' },
+            { title: 'AMS', url: 'https://ams.office.jemedia.org', icon: 'fa-music', category: 'server media audio' },
+            { title: 'JEM Photos', url: 'https://photos.jemedia.org', icon: 'fa-image', category: 'public media photo' },
+            { title: 'Rebbephoto', url: 'https://remote.rebbephoto.com', icon: 'fa-portrait', category: 'server media photo' },
+            { title: 'HMS En Jem.tv', url: 'https://videos.jem.tv/hms', icon: 'fa-file-alt', category: 'public text' },
+            { title: 'HMS Heb Jem.tv', url: 'https://videos.jem.tv/hms/he', icon: 'fa-language', category: 'public text' },
+            { title: 'JEMai', url: 'https://videos.jem.tv/jemai', icon: 'fa-robot', category: 'public ai' },
+            { title: 'JEMai V2', url: 'https://videos.jem.tv/jemai?version=2', icon: 'fa-brain', category: 'public ai' },
+            { title: 'JEMai V3', url: 'https://claude.ai', icon: 'fa-comments', category: 'public ai' },
+            { title: 'Serial Number POC', url: 'https://rebbephoto.com/serial-number-poc', icon: 'fa-id-card', category: 'public tools' },
+            { title: 'Generate CSV', url: 'https://jemcentral.org/test/jsonCsv.html', icon: 'fa-file-csv', category: 'public tools' },
+            { title: 'Tagging Tool', url: 'https://jem-tagging.web.app', icon: 'fa-tags', category: 'public tools' },
+            { title: 'Sign URL', url: 'https://ccdb-admin-prod.firebaseapp.com/sign-url', icon: 'fa-signature', category: 'server tools' },
+            { title: 'Search Faces', url: 'https://ccdb.jemedia.com/migration/face-recognition/search', icon: 'fa-user-friends', category: 'server media tools' },
+            { title: 'Clockin', url: 'https://app.clockify.me', icon: 'fa-clock', category: 'public outside' },
+            { title: 'Content Hub (Notion)', url: 'https://www.notion.so/jemedia/c027df7ff28443da92c14155172553e2?v=44b085f32e784854b6f02ac8bb0f7720&pvs=13', icon: 'fa-folder-open', category: 'server management' },
+            { title: 'Knowledgebase (Notion)', url: 'https://www.notion.so/jemedia/Knowledge-Base-d6ae2f07c1214a5e873f57357505e45c', icon: 'fa-book', category: 'server management' },
+            { title: 'GNMC Calendar', url: 'https://gnmc.office.jemedia.org/calendar', icon: 'fa-calendar-alt', category: 'server management' },
+            { title: 'Dedications', url: 'https://dedication.jemedia.org/category/gnmc', icon: 'fa-gift', category: 'public management' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initWorkspaceDashboard();
+            const urlParams = new URLSearchParams(window.location.search);
+            const filter = urlParams.get('filter');
+            filterLinks(filter === 'public' ? 'public' : 'all');
+            updateProjectsSection();
+            initDragAndDrop();
+        });
+
+        function switchMainTab(tab) {
+            const tabs = document.querySelectorAll('.main-tab');
+            const contents = document.querySelectorAll('.content-area');
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+            const activeTab = document.querySelector(`[onclick="switchMainTab('${tab}')"]`);
+            if (activeTab) activeTab.classList.add('active');
+            document.getElementById(tab === 'all' ? 'allContent' : 'workspaceContent').classList.add('active');
+        }
+
+        function filterLinks(category) {
+            const cards = document.querySelectorAll('#allContent .link-card');
+            const sections = document.querySelectorAll('#allContent .section-title, #allContent .links-grid');
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            const activeButton = document.querySelector(`.filter-btn[onclick="filterLinks('${category}')"]`);
+            if (activeButton) activeButton.classList.add('active');
+
+            sections.forEach(section => {
+                const sectionId = section.dataset.sectionId;
+                const sectionCards = section.querySelectorAll('.link-card');
+                let hasVisibleCard = false;
+
+                if (section.classList.contains('links-grid')) {
+                    sectionCards.forEach(card => {
+                        const cardCategory = card.dataset.category;
+                        if (category === 'all' || (cardCategory && cardCategory.includes(category))) {
+                            card.classList.remove('hidden');
+                            hasVisibleCard = true;
+                        } else {
+                            card.classList.add('hidden');
+                        }
+                    });
+
+                    const sectionTitle = document.querySelector(`.section-title[data-section-id="${sectionId}"]`);
+                    if (sectionTitle) {
+                        sectionTitle.classList.toggle('hidden', !hasVisibleCard);
+                    }
+                    section.classList.toggle('hidden', !hasVisibleCard);
+                }
+            });
+        }
+
+        const ALL_SECTIONS = [
+            { title: 'Video', id: 'video' },
+            { title: 'Audio', id: 'audio' },
+            { title: 'Photos', id: 'photo' },
+            { title: 'Text', id: 'text' },
+            { title: 'AI Tools', id: 'ai' },
+            { title: 'Tools', id: 'tools' },
+            { title: 'Outside Tools', id: 'outside' },
+            { title: 'Management', id: 'management' },
+            { title: 'Projects', id: 'projects' }
+        ];
+
+        function initWorkspaceDashboard() {
+            if (localStorage.getItem('workspaceDashboardSections') === null) {
+                const allSectionIds = ALL_SECTIONS.map(s => s.id);
+                localStorage.setItem('workspaceDashboardSections', JSON.stringify(allSectionIds));
+            }
+            if (!localStorage.getItem('userProjects')) {
+                localStorage.setItem('userProjects', JSON.stringify([]));
+            }
+
+            const manageModal = document.getElementById('manageModal');
+            const projectModal = document.getElementById('projectModal');
+            const manageBtn = document.getElementById('manageDashboardBtn');
+            const addProjectBtn = document.getElementById('addProjectBtn');
+            const exportBtn = document.getElementById('exportProjectsBtn');
+            const manageCloseBtn = manageModal.querySelector('.close-btn');
+            const projectCloseBtn = projectModal.querySelector('.close-btn');
+            const saveBtn = document.getElementById('saveDashboardBtn');
+            const saveProjectBtn = document.getElementById('saveProjectBtn');
+            const checkboxContainer = document.getElementById('sectionCheckboxes');
+            const projectLinksSelect = document.getElementById('projectLinks');
+
+            if (checkboxContainer.children.length === 0) {
+                ALL_SECTIONS.forEach(section => {
+                    checkboxContainer.innerHTML += `
+                        <label>
+                            <input type="checkbox" value="${section.id}" name="dashboardSection">
+                            ${section.title}
+                        </label>
+                    `;
+                });
+            }
+
+            if (projectLinksSelect.children.length === 0) {
+                ALL_LINKS.forEach(link => {
+                    projectLinksSelect.innerHTML += `
+                        <option value="${link.url}" data-icon="${link.icon}">
+                            ${link.title} (${link.category})
+                        </option>
+                    `;
+                });
+            }
+
+            manageBtn.onclick = () => openManageModal();
+            addProjectBtn.onclick = () => projectModal.style.display = 'block';
+            exportBtn.onclick = () => exportProjectsToCSV();
+            manageCloseBtn.onclick = () => manageModal.style.display = 'none';
+            projectCloseBtn.onclick = () => projectModal.style.display = 'none';
+            saveBtn.onclick = () => saveDashboardSettings();
+            saveProjectBtn.onclick = () => saveNewProject();
+            window.onclick = (event) => {
+                if (event.target == manageModal) manageModal.style.display = 'none';
+                if (event.target == projectModal) projectModal.style.display = 'none';
+            };
+
+            renderWorkspaceDashboard();
+            updateProjectsSection();
+        }
+
+        function openManageModal() {
+            const savedSections = JSON.parse(localStorage.getItem('workspaceDashboardSections'));
+            const checkboxes = document.querySelectorAll('#sectionCheckboxes input[type="checkbox"]');
+            checkboxes.forEach(box => {
+                box.checked = savedSections.includes(box.value);
+            });
+            document.getElementById('manageModal').style.display = 'block';
+        }
+
+        function saveDashboardSettings() {
+            const checkboxes = document.querySelectorAll('#sectionCheckboxes input[type="checkbox"]:checked');
+            const selectedSections = Array.from(checkboxes).map(box => box.value);
+            localStorage.setItem('workspaceDashboardSections', JSON.stringify(selectedSections));
+            document.getElementById('manageModal').style.display = 'none';
+            renderWorkspaceDashboard();
+        }
+
+        function saveNewProject() {
+            const title = document.getElementById('projectTitle').value;
+            const urls = Array.from(document.getElementById('projectLinks').selectedOptions).map(option => ({
+                url: option.value,
+                title: option.text.split(' (')[0],
+                icon: option.dataset.icon
+            }));
+            const desc = document.getElementById('projectDesc').value;
+            const icon = document.getElementById('projectIcon').value;
+
+            if (!title || urls.length === 0) {
+                alert('Please fill in the project title and select at least one link');
+                return;
+            }
+
+            const projects = JSON.parse(localStorage.getItem('userProjects') || '[]');
+            projects.push({ title, urls, desc, icon, category: 'public projects' });
+            localStorage.setItem('userProjects', JSON.stringify(projects));
+
+            document.getElementById('projectModal').style.display = 'none';
+            document.getElementById('projectTitle').value = '';
+            document.getElementById('projectLinks').selectedIndex = -1;
+            document.getElementById('projectDesc').value = '';
+            renderWorkspaceDashboard();
+            updateProjectsSection();
+        }
+
+        function exportProjectsToCSV() {
+            const projects = JSON.parse(localStorage.getItem('userProjects') || '[]');
+            let csvContent = 'data:text/csv;charset=utf-8,Title,Links,Description,Icon\n';
+
+            projects.forEach(project => {
+                const links = project.urls.map(link => `${link.title}: ${link.url}`).join('; ');
+                const row = `"${project.title.replace(/"/g, '""')}","${links.replace(/"/g, '""')}","${(project.desc || '').replace(/"/g, '""')}","${project.icon}"\n`;
+                csvContent += row;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'projects_export.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function updateProjectsSection() {
+            const projectsGrid = document.querySelector('.links-grid[data-section-id="projects"]');
+            if (projectsGrid) {
+                projectsGrid.innerHTML = '';
+                const projects = JSON.parse(localStorage.getItem('userProjects') || '[]');
+                projects.forEach(project => {
+                    project.urls.forEach((link, index) => {
+                        projectsGrid.innerHTML += `
+                            <div class="link-card draggable" data-category="public projects">
+                                <div class="link-icon"><i class="fas ${link.icon || project.icon}"></i></div>
+                                <div class="link-title">${project.title}${project.urls.length > 1 ? ` (${index + 1})` : ''}</div>
+                                <div class="link-desc">${project.desc || 'No description'}</div>
+                                <a class="link-btn" href="${link.url}" target="_blank" rel="noopener">
+                                    <i class="fas fa-external-link-alt"></i> Visit ${link.title}
+                                </a>
+                            </div>
+                        `;
+                    });
+                });
+            }
+        }
+
+        function renderWorkspaceDashboard() {
+            const container = document.getElementById('workspaceDashboardContainer');
+            container.innerHTML = '';
+            const savedSections = JSON.parse(localStorage.getItem('workspaceDashboardSections'));
+
+            if (savedSections.length === 0) {
+                container.innerHTML = `<p style="text-align: center;">Your workspace is empty. Click "Manage Sections" to add content.</p>`;
+                return;
+            }
+
+            savedSections.forEach(sectionId => {
+                const originalTitle = document.querySelector(`#allContent h2[data-section-id="${sectionId}"]`);
+                if (originalTitle) {
+                    const originalGrid = originalTitle.nextElementSibling;
+                    const sectionWrapper = document.createElement('div');
+                    sectionWrapper.className = 'draggable-section';
+                    sectionWrapper.dataset.sectionId = sectionId;
+                    sectionWrapper.draggable = true;
+                    const clonedTitle = originalTitle.cloneNode(true);
+                    const clonedGrid = originalGrid.cloneNode(true);
+                    sectionWrapper.appendChild(clonedTitle);
+                    sectionWrapper.appendChild(clonedGrid);
+                    container.appendChild(sectionWrapper);
+                }
+            });
+            updateProjectsSection();
+        }
+
+        function initDragAndDrop() {
+            const containers = document.querySelectorAll('#allContent .links-grid, #workspaceDashboardContainer');
+            let draggedItem = null;
+
+            containers.forEach(container => {
+                container.addEventListener('dragstart', (e) => {
+                    if (e.target.classList.contains('draggable-section') || e.target.classList.contains('link-card')) {
+                        draggedItem = e.target;
+                        e.target.classList.add('dragging');
+                        e.dataTransfer.setData('text/plain', '');
+                    }
+                });
+
+                container.addEventListener('dragend', (e) => {
+                    if (e.target.classList.contains('draggable-section') || e.target.classList.contains('link-card')) {
+                        e.target.classList.remove('dragging');
+                        draggedItem = null;
+                    }
+                });
+
+                container.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                });
+
+                container.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const dropTarget = e.target.closest('.draggable-section, .link-card');
+                    const dropContainer = e.target.closest('.links-grid, #workspaceDashboardContainer');
+
+                    if (draggedItem && dropTarget && dropContainer) {
+                        if (draggedItem.classList.contains('draggable-section') && dropTarget.classList.contains('draggable-section')) {
+                            const allSections = Array.from(document.querySelectorAll('#workspaceDashboardContainer .draggable-section'));
+                            const draggedIndex = allSections.indexOf(draggedItem);
+                            const dropIndex = allSections.indexOf(dropTarget);
+
+                            if (draggedIndex < dropIndex) {
+                                dropContainer.insertBefore(draggedItem, dropTarget.nextSibling);
+                            } else {
+                                dropContainer.insertBefore(draggedItem, dropTarget);
+                            }
+
+                            const savedSections = JSON.parse(localStorage.getItem('workspaceDashboardSections'));
+                            const draggedSectionId = draggedItem.dataset.sectionId;
+                            savedSections.splice(draggedIndex, 1);
+                            savedSections.splice(dropIndex, 0, draggedSectionId);
+                            localStorage.setItem('workspaceDashboardSections', JSON.stringify(savedSections));
+                        } else if (draggedItem.classList.contains('link-card') && dropContainer.classList.contains('links-grid')) {
+                            const allCards = Array.from(dropContainer.querySelectorAll('.link-card'));
+                            const dropIndex = dropTarget.classList.contains('link-card') ? allCards.indexOf(dropTarget) : allCards.length;
+
+                            if (dropTarget.classList.contains('link-card')) {
+                                if (allCards.indexOf(draggedItem) < dropIndex) {
+                                    dropContainer.insertBefore(draggedItem, dropTarget.nextSibling);
+                                } else {
+                                    dropContainer.insertBefore(draggedItem, dropTarget);
+                                }
+                            } else {
+                                dropContainer.appendChild(draggedItem);
+                            }
+                        }
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
