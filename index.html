@@ -28,8 +28,39 @@
             text-align: center;
             margin: 0;
         }
+        #login {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: var(--main-bg);
+        }
+        #login input {
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-right: 10px;
+            width: 200px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            color: var(--text);
+        }
+        #login button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #login button:hover {
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            transform: translateY(-2px);
+        }
         .header {
-            color:  #e0e0e0;
             padding: 10px 0;
             position: sticky;
             top: 0;
@@ -42,7 +73,6 @@
         }
         .header-logo {
             max-width: 50px;
-            color:  #00000;
             height: auto;
             filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
         }
@@ -261,7 +291,7 @@
             backdrop-filter: blur(8px);
             box-shadow: var(--glass-shadow);
         }
-        .drag-arrow:hover {
+        .drag-arrow:hover:not(:disabled) {
             background: rgba(255, 255, 255, 0.3);
             transform: translateY(-1px);
         }
@@ -456,6 +486,48 @@
             border: none;
             border-radius: 12px;
             margin-top: 20px;
+            position: relative;
+        }
+        .iframe-container.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 30;
+            background: var(--main-bg);
+            margin: 0;
+            border-radius: 0;
+        }
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 12px;
+        }
+        .iframe-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+            z-index: 35;
+        }
+        .iframe-control-btn {
+            background: var(--glass-bg);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+            box-shadow: var(--glass-shadow);
+        }
+        .iframe-control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
         }
         .footer {
             background: var(--card-bg);
@@ -480,303 +552,319 @@
             .browse-tabs { flex-direction: column; gap: 6px; padding: 6px; }
             .browse-tab { padding: 8px 16px; font-size: 0.9rem; }
             .iframe-container { height: calc(100vh - 250px); }
+            .iframe-controls { top: 5px; right: 5px; }
+            .iframe-control-btn { padding: 6px; font-size: 0.9rem; }
+            #login input { width: 150px; font-size: 0.9rem; }
+            #login button { padding: 8px 16px; font-size: 0.9rem; }
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <i class="fas fa-bars hamburger" onclick="toggleSideMenu()"></i>
-        <img src="https://jemcentral.org/wp-content/uploads/2018/11/jem-logo.gif" alt="JEM Logo" class="header-logo">
-    </header>
-    <div class="side-menu" id="sideMenu">
-        <!-- Dynamically populated -->
+    <div id="login">
+        <input type="password" id="code" placeholder="Enter access code" />
+        <button onclick="checkCode()">Enter</button>
     </div>
-    <div class="container">
-        <div class="main-tabs">
-            <button class="main-tab active" onclick="switchMainTab('all')"><i class="fas fa-list"></i> All Links</button>
-            <button class="main-tab" onclick="switchMainTab('workspace')"><i class="fas fa-briefcase"></i> Workspace</button>
-            <button class="main-tab" onclick="switchMainTab('browse')"><i class="fas fa-globe"></i> Browse</button>
+    <div id="mainContent" style="display:none;">
+        <header class="header">
+            <i class="fas fa-bars hamburger" onclick="toggleSideMenu()"></i>
+            <img src="https://jemcentral.org/wp-content/uploads/2018/11/jem-logo.gif" alt="JEM Logo" class="header-logo">
+        </header>
+        <div class="side-menu" id="sideMenu">
+            <!-- Dynamically populated -->
         </div>
-        <div id="allContent" class="content-area active">
-            <div class="filter-section">
-                <h3 class="filter-title">Filter Links</h3>
-                <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="filterLinks('all')">All</button>
-                    <button class="filter-btn" onclick="filterLinks('public')">Public</button>
-                    <button class="filter-btn" onclick="filterLinks('server')">Server</button>
-                    <button class="filter-btn" onclick="filterLinks('video')">Video</button>
-                    <button class="filter-btn" onclick="filterLinks('media')">Media</button>
-                    <button class="filter-btn" onclick="filterLinks('text')">Text</button>
-                    <button class="filter-btn" onclick="filterLinks('ai')">AI Tools</button>
-                    <button class="filter-btn" onclick="filterLinks('tools')">Tools</button>
-                </div>
+        <div class="container">
+            <div class="main-tabs">
+                <button class="main-tab active" onclick="switchMainTab('all')"><i class="fas fa-list"></i> All Links</button>
+                <button class="main-tab" onclick="switchMainTab('workspace')"><i class="fas fa-briefcase"></i> Workspace</button>
+                <button class="main-tab" onclick="switchMainTab('browse')"><i class="fas fa-globe"></i> Browse</button>
             </div>
-            <h2 class="section-title" data-section-id="video"><i class="fas fa-video"></i> Video</h2>
-            <div class="links-grid" data-section-id="video">
-                <div class="link-card draggable" data-category="public video">
-                    <div class="link-icon"><i class="fas fa-video"></i></div>
-                    <div class="link-title">jem.tv</div>
-                    <div class="link-desc">Main site, should usually have the best experience</div>
-                    <a class="link-btn" href="https://videos.jem.tv" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Visit jem.tv
-                    </a>
-                </div>
-                <div class="link-card draggable" data-category="server video">
-                    <div class="link-icon"><i class="fas fa-server"></i></div>
-                    <div class="link-title">VMS</div>
-                    <div class="link-desc">Archive for all videos</div>
-                    <a class="link-btn" href="https://vms.jemedia.com" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Visit VMS
-                    </a>
-                </div>
-                <div class="link-card draggable" data-category="public video">
-                    <div class="link-icon"><i class="fas fa-star"></i></div>
-                    <div class="link-title">Old LT Chabadorg</div>
-                    <div class="link-desc">Legacy LT programs not yet on jem.tv</div>
-                    <a class="link-btn" href="https://chabad.org/lt" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Visit Chabad.org
-                    </a>
-                </div>
-            </div>
-            <h2 class="section-title" data-section-id="audio"><i class="fas fa-headphones"></i> Audio</h2>
-            <div class="links-grid" data-section-id="audio">
-                <div class="link-card draggable" data-category="public media audio">
-                    <div class="link-icon"><i class="fas fa-headphones"></i></div>
-                    <div class="link-title">Ashreinu</div>
-                    <div class="link-desc">Audio events and resources</div>
-                    <a class="link-btn" href="https://ashreinu.app/events" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Visit Ashreinu
-                    </a>
-                </div>
-                <div class="link-card draggable" data-category="server media audio">
-                    <div class="link-icon"><i class="fas fa-music"></i></div>
-                    <div class="link-title">AMS</div>
-                    <div class="link-desc">Audio management system</div>
-                    <a class="link-btn" href="https://ams.office.jemedia.org" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Visit AMS
-                    </a>
-                </div>
-            </div>
-            <h2 class="section-title" data-section-id="photo"><i class="fas fa-image"></i> Photos</h2>
-            <div class="links-grid" data-section-id="photo">
-                <div class="link-card draggable" data-category="public media photo">
-                    <div class="link-icon"><i class="fas fa-image"></i></div>
-                    <div class="link-title">JEM Photos</div>
-                    <div class="link-desc">Photo archive and search</div>
-                    <a class="link-btn" href="https://photos.jemedia.org" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Visit JEM Photos
-                    </a>
-                </div>
-                <div class="link-card draggable" data-category="server media photo">
-                    <div class="link-icon"><i class="fas fa-portrait"></i></div>
-                    <div class="link-title">Rebbephoto</div>
-                    <div class="link-desc">Rebbe photo archive</div>
-                    <a class="link-btn" href="https://remote.rebbephoto.com" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Visit Rebbephoto
-                    </a>
-                </div>
-            </div>
-            <h2 class="section-title" data-section-id="text"><i class="fas fa-file-alt"></i> Text</h2>
-            <div class="links-grid" data-section-id="text">
-                <div class="link-card draggable" data-category="public text">
-                    <div class="link-icon"><i class="fas fa-file-alt"></i></div>
-                    <div class="link-title">HMS En Jem.tv</div>
-                    <div class="link-desc">English My Encounter stories</div>
-                    <a class="link-btn" href="https://videos.jem.tv/hms" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Visit HMS
-                    </a>
-                </div>
-                <div class="link-card draggable" data-category="public text">
-                    <div class="link-icon"><i class="fas fa-language"></i></div>
-                    <div class="link-title">HMS Heb Jem.tv</div>
-                    <div class="link-desc">Hebrew My Encounter stories - Coming soon</div>
-                    <a class="link-btn" href="https://videos.jem.tv/hms/he" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Visit HMS Hebrew
-                    </a>
-                </div>
-            </div>
-            <h2 class="section-title" data-section-id="ai"><i class="fas fa-robot"></i> AI Tools</h2>
-            <div class="links-grid" data-section-id="ai">
-                <div class="link-card draggable" data-category="public ai">
-                    <div class="link-icon"><i class="fas fa-robot"></i></div>
-                    <div class="link-title">JEMai</div>
-                    <div class="link-desc">AI-powered video search and more</div>
-                    <a class="link-btn" href="https://videos.jem.tv/jemai" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Try JEMai
-                    </a>
-                </div>
-                <div class="link-card draggable" data-category="public ai">
-                    <div class="link-icon"><i class="fas fa-brain"></i></div>
-                    <div class="link-title">JEMai V2</div>
-                    <div class="link-desc">Enhanced AI search capabilities</div>
-                    <a class="link-btn" href="https://videos.jem.tv/jemai?version=2" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Try JEMai V2
-                    </a>
-                </div>
-                <div class="link-card draggable" data-category="public ai">
-                    <div class="link-icon"><i class="fas fa-comments"></i></div>
-                    <div class="link-title">JEMai V3</div>
-                    <div class="link-desc">Claude Chat integration</div>
-                    <a class="link-btn" href="https://claude.ai" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Claude Chat
-                    </a>
-                </div>
-            </div>
-            <h2 class="section-title" data-section-id="tools"><i class="fas fa-tools"></i> Tools</h2>
-            <div class="links-grid" data-section-id="tools">
-                <div class="link-card draggable" data-category="public tools">
-                    <div class="link-icon"><i class="fas fa-id-card"></i></div>
-                    <div class="link-title">Serial Number POC</div>
-                    <div class="link-desc">Find photos by serial number</div>
-                    <a class="link-btn" href="https://rebbephoto.com/serial-number-poc" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Serial Number Tool
-                    </a>
-                </div>
-                <div class="link-card draggable" data-category="public tools">
-                    <div class="link-icon"><i class="fas fa-file-csv"></i></div>
-                    <div class="link-title">Generate CSV</div>
-                    <div class="link-desc">CSV generation tool</div>
-                    <a class="link-btn" href="https://jemcentral.org/test/jsonCsv.html" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Generate CSV
-                    </a>
-                </div>
-                <div class="link-card draggable" data-category="public tools">
-                    <div class="link-icon"><i class="fas fa-tags"></i></div>
-                    <div class="link-title">Tagging Tool</div>
-                    <div class="link-desc">Tag and organize media content</div>
-                    <a class="link-btn" href="https://jem-tagging.web.app" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Open Tagging Tool
-                    </a>
-                </div>
-                <div class="link-card draggable" data-category="server tools">
-                    <div class="link-icon"><i class="fas fa-signature"></i></div>
-                    <div class="link-title">Sign URL</div>
-                    <div class="link-desc">URL signing tool</div>
-                    <a class="link-btn" href="https://ccdb-admin-prod.firebaseapp.com/sign-url" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Sign URL
-                    </a>
-                </div>
-                <div class="link-card draggable" data-category="server media tools">
-                    <div class="link-icon"><i class="fas fa-user-friends"></i></div>
-                    <div class="link-title">Search Faces</div>
-                    <div class="link-desc">Face recognition and search in JEM archives</div>
-                    <a class="link-btn" href="https://ccdb.jemedia.com/migration/face-recognition/search" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Search Faces
-                    </a>
-                </div>
-            </div>
-            <h2 class="section-title" data-section-id="outside"><i class="fas fa-external-link-alt"></i> Outside Tools</h2>
-            <div class="links-grid" data-section-id="outside">
-                <div class="link-card draggable" data-category="public outside">
-                    <div class="link-icon"><i class="fas fa-clock"></i></div>
-                    <div class="link-title">Clockin</div>
-                    <div class="link-desc">Time tracking for projects</div>
-                    <a class="link-btn" href="https://app.clockify.me" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Open Clockify
-                    </a>
-                </div>
-            </div>
-            <h2 class="section-title" data-section-id="management"><i class="fas fa-folder-open"></i> Management</h2>
-            <div class="links-grid" data-section-id="management">
-                <div class="link-card draggable" data-category="server management">
-                    <div class="link-icon"><i class="fas fa-folder-open"></i></div>
-                    <div class="link-title">Content Hub (Notion)</div>
-                    <div class="link-desc">Centralized Notion workspace for JEM</div>
-                    <a class="link-btn" href="https://www.notion.so/jemedia/c027df7ff28443da92c14155172553e2?v=44b085f32e784854b6f02ac8bb0f7720&pvs=13" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Open Content Hub
-                    </a>
-                </div>
-                <div class="link-card draggable" data-category="server management">
-                    <div class="link-icon"><i class="fas fa-book"></i></div>
-                    <div class="link-title">Knowledgebase (Notion)</div>
-                    <div class="link-desc">JEM internal knowledge base</div>
-                    <a class="link-btn" href="https://www.notion.so/jemedia/Knowledge-Base-d6ae2f07c1214a5e873f57357505e45c" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> Open Knowledgebase
-                    </a>
-                </div>
-                <div class="link-card draggable" data-category="server management">
-                    <div class="link-icon"><i class="fas fa-calendar-alt"></i></div>
-                    <div class="link-title">GNMC Calendar</div>
-                    <div class="link-desc">Project and event calendar</div>
-                    <a class="link-btn" href="https://gnmc.office.jemedia.org/calendar" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> View Calendar
-                    </a>
-                </div>
-                <div class="link-card draggable" data-category="public management">
-                    <div class="link-icon"><i class="fas fa-gift"></i></div>
-                    <div class="link-title">Dedications</div>
-                    <div class="link-desc">Dedication opportunities and info</div>
-                    <a class="link-btn" href="https://dedication.jemedia.org/category/gnmc" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt"></i> View Dedications
-                    </a>
-                </div>
-            </div>
-            <h2 class="section-title" data-section-id="projects"><i class="fas fa-project-diagram"></i> Projects</h2>
-            <div class="links-grid" data-section-id="projects"></div>
-        </div>
-        <div id="workspaceContent" class="content-area">
-            <div class="workspace-section">
-                <div class="workspace-header">
-                    <h3 class="workspace-title">Workspace</h3>
-                    <div>
-                        <button id="manageDashboardBtn" class="link-btn">
-                            <i class="fas fa-cog"></i> Manage Sections
-                        </button>
-                        <button id="addProjectBtn" class="link-btn">
-                            <i class="fas fa-plus"></i> Add Project
-                        </button>
+            <div id="allContent" class="content-area active">
+                <div class="filter-section">
+                    <h3 class="filter-title">Filter Links</h3>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="filterLinks('all')">All</button>
+                        <button class="filter-btn" onclick="filterLinks('public')">Public</button>
+                        <button class="filter-btn" onclick="filterLinks('server')">Server</button>
+                        <button class="filter-btn" onclick="filterLinks('video')">Video</button>
+                        <button class="filter-btn" onclick="filterLinks('media')">Media</button>
+                        <button class="filter-btn" onclick="filterLinks('text')">Text</button>
+                        <button class="filter-btn" onclick="filterLinks('ai')">AI Tools</button>
+                        <button class="filter-btn" onclick="filterLinks('tools')">Tools</button>
                     </div>
                 </div>
-                <p class="drag-note">Drag sections/cards or use arrows to reorder, like in Monday.com</p>
-                <div id="workspaceDashboardContainer" class="workspace-dashboard"></div>
+                <h2 class="section-title" data-section-id="video"><i class="fas fa-video"></i> Video</h2>
+                <div class="links-grid" data-section-id="video">
+                    <div class="link-card draggable" data-category="public video">
+                        <div class="link-icon"><i class="fas fa-video"></i></div>
+                        <div class="link-title">jem.tv</div>
+                        <div class="link-desc">Main site, should usually have the best experience</div>
+                        <a class="link-btn" href="https://videos.jem.tv" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Visit jem.tv
+                        </a>
+                    </div>
+                    <div class="link-card draggable" data-category="server video">
+                        <div class="link-icon"><i class="fas fa-server"></i></div>
+                        <div class="link-title">VMS</div>
+                        <div class="link-desc">Archive for all videos</div>
+                        <a class="link-btn" href="https://vms.jemedia.com" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Visit VMS
+                        </a>
+                    </div>
+                    <div class="link-card draggable" data-category="public video">
+                        <div class="link-icon"><i class="fas fa-star"></i></div>
+                        <div class="link-title">Old LT Chabadorg</div>
+                        <div class="link-desc">Legacy LT programs not yet on jem.tv</div>
+                        <a class="link-btn" href="https://chabad.org/lt" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Visit Chabad.org
+                        </a>
+                    </div>
+                </div>
+                <h2 class="section-title" data-section-id="audio"><i class="fas fa-headphones"></i> Audio</h2>
+                <div class="links-grid" data-section-id="audio">
+                    <div class="link-card draggable" data-category="public media audio">
+                        <div class="link-icon"><i class="fas fa-headphones"></i></div>
+                        <div class="link-title">Ashreinu</div>
+                        <div class="link-desc">Audio events and resources</div>
+                        <a class="link-btn" href="https://ashreinu.app/events" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Visit Ashreinu
+                        </a>
+                    </div>
+                    <div class="link-card draggable" data-category="server media audio">
+                        <div class="link-icon"><i class="fas fa-music"></i></div>
+                        <div class="link-title">AMS</div>
+                        <div class="link-desc">Audio management system</div>
+                        <a class="link-btn" href="https://ams.office.jemedia.org" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Visit AMS
+                        </a>
+                    </div>
+                </div>
+                <h2 class="section-title" data-section-id="photo"><i class="fas fa-image"></i> Photos</h2>
+                <div class="links-grid" data-section-id="photo">
+                    <div class="link-card draggable" data-category="public media photo">
+                        <div class="link-icon"><i class="fas fa-image"></i></div>
+                        <div class="link-title">JEM Photos</div>
+                        <div class="link-desc">Photo archive and search</div>
+                        <a class="link-btn" href="https://photos.jemedia.org" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Visit JEM Photos
+                        </a>
+                    </div>
+                    <div class="link-card draggable" data-category="server media photo">
+                        <div class="link-icon"><i class="fas fa-portrait"></i></div>
+                        <div class="link-title">Rebbephoto</div>
+                        <div class="link-desc">Rebbe photo archive</div>
+                        <a class="link-btn" href="https://remote.rebbephoto.com" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Visit Rebbephoto
+                        </a>
+                    </div>
+                </div>
+                <h2 class="section-title" data-section-id="text"><i class="fas fa-file-alt"></i> Text</h2>
+                <div class="links-grid" data-section-id="text">
+                    <div class="link-card draggable" data-category="public text">
+                        <div class="link-icon"><i class="fas fa-file-alt"></i></div>
+                        <div class="link-title">HMS En Jem.tv</div>
+                        <div class="link-desc">English My Encounter stories</div>
+                        <a class="link-btn" href="https://videos.jem.tv/hms" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Visit HMS
+                        </a>
+                    </div>
+                    <div class="link-card draggable" data-category="public text">
+                        <div class="link-icon"><i class="fas fa-language"></i></div>
+                        <div class="link-title">HMS Heb Jem.tv</div>
+                        <div class="link-desc">Hebrew My Encounter stories - Coming soon</div>
+                        <a class="link-btn" href="https://videos.jem.tv/hms/he" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Visit HMS Hebrew
+                        </a>
+                    </div>
+                </div>
+                <h2 class="section-title" data-section-id="ai"><i class="fas fa-robot"></i> AI Tools</h2>
+                <div class="links-grid" data-section-id="ai">
+                    <div class="link-card draggable" data-category="public ai">
+                        <div class="link-icon"><i class="fas fa-robot"></i></div>
+                        <div class="link-title">JEMai</div>
+                        <div class="link-desc">AI-powered video search and more</div>
+                        <a class="link-btn" href="https://videos.jem.tv/jemai" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Try JEMai
+                        </a>
+                    </div>
+                    <div class="link-card draggable" data-category="public ai">
+                        <div class="link-icon"><i class="fas fa-brain"></i></div>
+                        <div class="link-title">JEMai V2</div>
+                        <div class="link-desc">Enhanced AI search capabilities</div>
+                        <a class="link-btn" href="https://videos.jem.tv/jemai?version=2" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Try JEMai V2
+                        </a>
+                    </div>
+                    <div class="link-card draggable" data-category="public ai">
+                        <div class="link-icon"><i class="fas fa-comments"></i></div>
+                        <div class="link-title">JEMai V3</div>
+                        <div class="link-desc">Claude Chat integration</div>
+                        <a class="link-btn" href="https://claude.ai" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Claude Chat
+                        </a>
+                    </div>
+                </div>
+                <h2 class="section-title" data-section-id="tools"><i class="fas fa-tools"></i> Tools</h2>
+                <div class="links-grid" data-section-id="tools">
+                    <div class="link-card draggable" data-category="public tools">
+                        <div class="link-icon"><i class="fas fa-id-card"></i></div>
+                        <div class="link-title">Serial Number POC</div>
+                        <div class="link-desc">Find photos by serial number</div>
+                        <a class="link-btn" href="https://rebbephoto.com/serial-number-poc" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Serial Number Tool
+                        </a>
+                    </div>
+                    <div class="link-card draggable" data-category="public tools">
+                        <div class="link-icon"><i class="fas fa-file-csv"></i></div>
+                        <div class="link-title">Generate CSV</div>
+                        <div class="link-desc">CSV generation tool</div>
+                        <a class="link-btn" href="https://jemcentral.org/test/jsonCsv.html" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Generate CSV
+                        </a>
+                    </div>
+                    <div class="link-card draggable" data-category="public tools">
+                        <div class="link-icon"><i class="fas fa-tags"></i></div>
+                        <div class="link-title">Tagging Tool</div>
+                        <div class="link-desc">Tag and organize media content</div>
+                        <a class="link-btn" href="https://jem-tagging.web.app" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Open Tagging Tool
+                        </a>
+                    </div>
+                    <div class="link-card draggable" data-category="server tools">
+                        <div class="link-icon"><i class="fas fa-signature"></i></div>
+                        <div class="link-title">Sign URL</div>
+                        <div class="link-desc">URL signing tool</div>
+                        <a class="link-btn" href="https://ccdb-admin-prod.firebaseapp.com/sign-url" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Sign URL
+                        </a>
+                    </div>
+                    <div class="link-card draggable" data-category="server media tools">
+                        <div class="link-icon"><i class="fas fa-user-friends"></i></div>
+                        <div class="link-title">Search Faces</div>
+                        <div class="link-desc">Face recognition and search in JEM archives</div>
+                        <a class="link-btn" href="https://ccdb.jemedia.com/migration/face-recognition/search" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Search Faces
+                        </a>
+                    </div>
+                </div>
+                <h2 class="section-title" data-section-id="outside"><i class="fas fa-external-link-alt"></i> Outside Tools</h2>
+                <div class="links-grid" data-section-id="outside">
+                    <div class="link-card draggable" data-category="public outside">
+                        <div class="link-icon"><i class="fas fa-clock"></i></div>
+                        <div class="link-title">Clockin</div>
+                        <div class="link-desc">Time tracking for projects</div>
+                        <a class="link-btn" href="https://app.clockify.me" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Open Clockify
+                        </a>
+                    </div>
+                </div>
+                <h2 class="section-title" data-section-id="management"><i class="fas fa-folder-open"></i> Management</h2>
+                <div class="links-grid" data-section-id="management">
+                    <div class="link-card draggable" data-category="server management">
+                        <div class="link-icon"><i class="fas fa-folder-open"></i></div>
+                        <div class="link-title">Content Hub (Notion)</div>
+                        <div class="link-desc">Centralized Notion workspace for JEM</div>
+                        <a class="link-btn" href="https://www.notion.so/jemedia/c027df7ff28443da92c14155172553e2?v=44b085f32e784854b6f02ac8bb0f7720&pvs=13" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Open Content Hub
+                        </a>
+                    </div>
+                    <div class="link-card draggable" data-category="server management">
+                        <div class="link-icon"><i class="fas fa-book"></i></div>
+                        <div class="link-title">Knowledgebase (Notion)</div>
+                        <div class="link-desc">JEM internal knowledge base</div>
+                        <a class="link-btn" href="https://www.notion.so/jemedia/Knowledge-Base-d6ae2f07c1214a5e873f57357505e45c" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Open Knowledgebase
+                        </a>
+                    </div>
+                    <div class="link-card draggable" data-category="server management">
+                        <div class="link-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="link-title">GNMC Calendar</div>
+                        <div class="link-desc">Project and event calendar</div>
+                        <a class="link-btn" href="https://gnmc.office.jemedia.org/calendar" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> View Calendar
+                        </a>
+                    </div>
+                    <div class="link-card draggable" data-category="public management">
+                        <div class="link-icon"><i class="fas fa-gift"></i></div>
+                        <div class="link-title">Dedications</div>
+                        <div class="link-desc">Dedication opportunities and info</div>
+                        <a class="link-btn" href="https://dedication.jemedia.org/category/gnmc" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> View Dedications
+                        </a>
+                    </div>
+                </div>
+                <h2 class="section-title" data-section-id="projects"><i class="fas fa-project-diagram"></i> Projects</h2>
+                <div class="links-grid" data-section-id="projects"></div>
+            </div>
+            <div id="workspaceContent" class="content-area">
+                <div class="workspace-section">
+                    <div class="workspace-header">
+                        <h3 class="workspace-title">Workspace</h3>
+                        <div>
+                            <button id="manageDashboardBtn" class="link-btn">
+                                <i class="fas fa-cog"></i> Manage Sections
+                            </button>
+                            <button id="addProjectBtn" class="link-btn">
+                                <i class="fas fa-plus"></i> Add Project
+                            </button>
+                        </div>
+                    </div>
+                    <p class="drag-note">Drag sections/cards or use arrows to reorder, like in Monday.com</p>
+                    <div id="workspaceDashboardContainer" class="workspace-dashboard"></div>
+                </div>
+            </div>
+            <div id="browseContent" class="content-area">
+                <div class="browse-tabs">
+                    <button class="browse-tab active" onclick="switchBrowseTab('jemtv')"><i class="fas fa-video"></i> JEM.tv</button>
+                    <button class="browse-tab" onclick="switchBrowseTab('photos')"><i class="fas fa-image"></i> JEM Photos</button>
+                    <button class="browse-tab" onclick="switchBrowseTab('ashreinu')"><i class="fas fa-headphones"></i> Ashreinu</button>
+                </div>
+                <div class="iframe-container" id="iframeContainer">
+                    <div class="iframe-controls">
+                        <button class="iframe-control-btn" onclick="goBackIframe()"><i class="fas fa-arrow-left"></i></button>
+                        <button class="iframe-control-btn" onclick="toggleFullscreen()"><i class="fas fa-expand"></i></button>
+                    </div>
+                    <iframe id="browseIframe" src="https://videos.jem.tv" frameborder="0"></iframe>
+                </div>
+            </div>
+            <div class="footer">
+                © 2025 Jewish Educational Media Inc. • jem@jemedia.org • 718-774-6000
             </div>
         </div>
-        <div id="browseContent" class="content-area">
-            <div class="browse-tabs">
-                <button class="browse-tab active" onclick="switchBrowseTab('jemtv')"><i class="fas fa-video"></i> JEM.tv</button>
-                <button class="browse-tab" onclick="switchBrowseTab('photos')"><i class="fas fa-image"></i> JEM Photos</button>
-                <button class="browse-tab" onclick="switchBrowseTab('ashreinu')"><i class="fas fa-headphones"></i> Ashreinu</button>
+        <div id="manageModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">×</span>
+                <h4>Select sections for your workspace</h4>
+                <div id="sectionCheckboxes"></div>
+                <button id="saveDashboardBtn" class="link-btn">Save Preferences</button>
             </div>
-            <iframe id="browseIframe" class="iframe-container" src="https://videos.jem.tv" frameborder="0"></iframe>
         </div>
-        <div class="footer">
-            © 2025 Jewish Educational Media Inc. • jem@jemedia.org • 718-774-6000
-        </div>
-    </div>
-    <div id="manageModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn">×</span>
-            <h4>Select sections for your workspace</h4>
-            <div id="sectionCheckboxes"></div>
-            <button id="saveDashboardBtn" class="link-btn">Save Preferences</button>
-        </div>
-    </div>
-    <div id="projectModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn">×</span>
-            <h4>Add New Project</h4>
-            <div id="newProjectForm">
-                <label>
-                    Project Name
-                    <input type="text" id="projectTitle" required>
-                </label>
-                <label>
-                    Project Links
-                    <select id="projectLinks" multiple>
-                        <!-- Populated dynamically -->
-                    </select>
-                </label>
-                <label>
-                    Icon
-                    <select id="projectIcon">
-                        <option value="fa-project-diagram">Project Diagram</option>
-                        <option value="fa-folder">Folder</option>
-                        <option value="fa-file">File</option>
-                        <option value="fa-link">Link</option>
-                    </select>
-                </label>
+        <div id="projectModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">×</span>
+                <h4>Add New Project</h4>
+                <div id="newProjectForm">
+                    <label>
+                        Project Name
+                        <input type="text" id="projectTitle" required>
+                    </label>
+                    <label>
+                        Project Links
+                        <select id="projectLinks" multiple>
+                            <!-- Populated dynamically -->
+                        </select>
+                    </label>
+                    <label>
+                        Icon
+                        <select id="projectIcon">
+                            <option value="fa-project-diagram">Project Diagram</option>
+                            <option value="fa-folder">Folder</option>
+                            <option value="fa-file">File</option>
+                            <option value="fa-link">Link</option>
+                        </select>
+                    </label>
+                </div>
+                <button id="saveProjectBtn" class="link-btn">Save Project</button>
             </div>
-            <button id="saveProjectBtn" class="link-btn">Save Project</button>
         </div>
     </div>
     <script>
@@ -816,6 +904,16 @@
             { title: 'Management', id: 'management', icon: 'fa-folder-open' },
             { title: 'Projects', id: 'projects', icon: 'fa-project-diagram' }
         ];
+
+        function checkCode() {
+            const code = document.getElementById('code').value;
+            if (code === 'toplevel') {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+            } else {
+                alert('Wrong code!');
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             initSideMenu();
@@ -880,6 +978,30 @@
                 ashreinu: 'https://ashreinu.app'
             };
             iframe.src = urls[tab];
+        }
+
+        function goBackIframe() {
+            const iframe = document.getElementById('browseIframe');
+            if (iframe.contentWindow) {
+                iframe.contentWindow.history.back();
+            }
+        }
+
+        function toggleFullscreen() {
+            const iframeContainer = document.getElementById('iframeContainer');
+            const iframe = document.getElementById('browseIframe');
+            const fullscreenBtn = iframeContainer.querySelector('.iframe-control-btn i.fa-expand, .iframe-control-btn i.fa-compress');
+            if (iframeContainer.classList.contains('fullscreen')) {
+                iframeContainer.classList.remove('fullscreen');
+                iframe.style.height = 'calc(100vh - 200px)';
+                fullscreenBtn.classList.remove('fa-compress');
+                fullscreenBtn.classList.add('fa-expand');
+            } else {
+                iframeContainer.classList.add('fullscreen');
+                iframe.style.height = '100vh';
+                fullscreenBtn.classList.remove('fa-expand');
+                fullscreenBtn.classList.add('fa-compress');
+            }
         }
 
         function filterLinks(category) {
@@ -1125,50 +1247,72 @@
 
         function moveItem(button, direction) {
             const item = button.closest('.draggable-section, .link-card');
+            if (!item) return;
+
             const container = item.closest('.links-grid, #workspaceDashboardContainer');
+            if (!container) return;
+
             const items = Array.from(container.querySelectorAll('.draggable-section, .link-card'));
             const index = items.indexOf(item);
 
             if (item.classList.contains('draggable-section')) {
                 if (direction === 'up' && index > 0) {
-                    container.insertBefore(item, items[index - 1]);
+                    const prevItem = items[index - 1];
+                    if (prevItem && prevItem.parentNode === container) {
+                        container.insertBefore(item, prevItem);
+                        updateSectionOrder(index, index - 1);
+                    }
                 } else if (direction === 'down' && index < items.length - 1) {
-                    container.insertBefore(item, items[index + 1].nextSibling);
-                } else {
-                    return;
+                    const nextItem = items[index + 1];
+                    if (nextItem && nextItem.parentNode === container) {
+                        container.insertBefore(item, nextItem.nextSibling || null);
+                        updateSectionOrder(index, index + 1);
+                    }
                 }
-                const savedSections = JSON.parse(localStorage.getItem('workspaceDashboardSections') || '[]');
-                const sectionId = item.dataset.sectionId;
-                const newIndex = direction === 'up' ? index - 1 : index + 1;
-                savedSections.splice(index, 1);
-                savedSections.splice(newIndex, 0, sectionId);
-                localStorage.setItem('workspaceDashboardSections', JSON.stringify(savedSections));
             } else if (item.classList.contains('link-card')) {
                 const sectionGrid = item.closest('.links-grid');
+                if (!sectionGrid) return;
                 const cards = Array.from(sectionGrid.querySelectorAll('.link-card'));
                 const cardIndex = cards.indexOf(item);
                 if (direction === 'left' && cardIndex > 0) {
-                    sectionGrid.insertBefore(item, cards[cardIndex - 1]);
+                    const prevCard = cards[cardIndex - 1];
+                    if (prevCard && prevCard.parentNode === sectionGrid) {
+                        sectionGrid.insertBefore(item, prevCard);
+                        updateCardOrder(sectionGrid, cardIndex, cardIndex - 1);
+                    }
                 } else if (direction === 'right' && cardIndex < cards.length - 1) {
-                    sectionGrid.insertBefore(item, cards[cardIndex + 1].nextSibling);
-                } else {
-                    return;
-                }
-
-                if (sectionGrid.dataset.sectionId === 'projects') {
-                    const projects = JSON.parse(localStorage.getItem('userProjects') || '[]');
-                    const projectIndex = parseInt(item.dataset.projectIndex);
-                    const linkIndex = parseInt(item.dataset.linkIndex);
-                    const link = projects[projectIndex].urls[linkIndex];
-                    projects[projectIndex].urls.splice(linkIndex, 1);
-                    const newLinkIndex = direction === 'left' ? linkIndex - 1 : linkIndex + 1;
-                    projects[projectIndex].urls.splice(newLinkIndex, 0, link);
-                    localStorage.setItem('userProjects', JSON.stringify(projects));
-                    updateProjectsSection();
+                    const nextCard = cards[cardIndex + 1];
+                    if (nextCard && nextCard.parentNode === sectionGrid) {
+                        sectionGrid.insertBefore(item, nextCard.nextSibling || null);
+                        updateCardOrder(sectionGrid, cardIndex, cardIndex + 1);
+                    }
                 }
             }
 
             updateArrowStates();
+        }
+
+        function updateSectionOrder(oldIndex, newIndex) {
+            const savedSections = JSON.parse(localStorage.getItem('workspaceDashboardSections') || '[]');
+            const sectionId = savedSections[oldIndex];
+            if (sectionId) {
+                savedSections.splice(oldIndex, 1);
+                savedSections.splice(newIndex, 0, sectionId);
+                localStorage.setItem('workspaceDashboardSections', JSON.stringify(savedSections));
+            }
+            renderWorkspaceDashboard();
+        }
+
+        function updateCardOrder(sectionGrid, oldIndex, newIndex) {
+            if (sectionGrid.dataset.sectionId === 'projects') {
+                const projects = JSON.parse(localStorage.getItem('userProjects') || '[]');
+                const projectIndex = parseInt(sectionGrid.querySelector('.link-card').dataset.projectIndex);
+                const link = projects[projectIndex].urls[oldIndex];
+                projects[projectIndex].urls.splice(oldIndex, 1);
+                projects[projectIndex].urls.splice(newIndex, 0, link);
+                localStorage.setItem('userProjects', JSON.stringify(projects));
+                updateProjectsSection();
+            }
         }
 
         function initDragAndDrop() {
@@ -1189,7 +1333,7 @@
                             placeholder.className = 'drag-placeholder';
                             placeholder.style.height = target.offsetHeight + 'px';
                             if (target.classList.contains('draggable-section')) {
-                                target.parentNode.insertBefore(placeholder, target.nextSibling);
+                                target.parentNode.insertBefore(placeholder, target.nextSibling || null);
                             } else {
                                 target.parentNode.insertBefore(placeholder, target);
                             }
@@ -1215,20 +1359,17 @@
                     e.preventDefault();
                     const target = e.target.closest('.draggable-section, .link-card');
                     const dropContainer = e.target.closest('.links-grid, #workspaceDashboardContainer');
-                    if (dropContainer && placeholder) {
+                    if (dropContainer && placeholder && draggedItem) {
                         const allItems = Array.from(dropContainer.querySelectorAll('.draggable-section, .link-card'));
                         const closestItem = allItems.find(item => {
+                            if (item === draggedItem) return false;
                             const rect = item.getBoundingClientRect();
-                            return e.clientY >= rect.top && e.clientY <= rect.bottom && item !== draggedItem;
+                            return e.clientY >= rect.top && e.clientY <= rect.bottom;
                         });
-                        if (closestItem) {
+                        if (closestItem && closestItem.parentNode === dropContainer) {
                             const rect = closestItem.getBoundingClientRect();
                             const isBefore = e.clientY < rect.top + rect.height / 2;
-                            if (isBefore) {
-                                dropContainer.insertBefore(placeholder, closestItem);
-                            } else {
-                                dropContainer.insertBefore(placeholder, closestItem.nextSibling);
-                            }
+                            dropContainer.insertBefore(placeholder, isBefore ? closestItem : closestItem.nextSibling || null);
                         } else {
                             dropContainer.appendChild(placeholder);
                         }
@@ -1251,11 +1392,13 @@
                         const isBefore = dropTarget && e.clientY < rect.top + rect.height / 2;
                         if (dropTarget && !isBefore) dropIndex++;
 
-                        if (draggedIndex !== dropIndex && draggedIndex !== dropIndex - 1) {
+                        if (draggedIndex !== -1 && draggedIndex !== dropIndex && draggedIndex !== dropIndex - 1) {
                             if (dropIndex >= allSections.length) {
                                 dropContainer.appendChild(draggedItem);
-                            } else {
+                            } else if (allSections[dropIndex] && allSections[dropIndex].parentNode === dropContainer) {
                                 dropContainer.insertBefore(draggedItem, allSections[dropIndex]);
+                            } else {
+                                dropContainer.appendChild(draggedItem);
                             }
 
                             const savedSections = JSON.parse(localStorage.getItem('workspaceDashboardSections') || '[]');
@@ -1270,12 +1413,8 @@
                         const rect = dropTarget?.getBoundingClientRect();
                         const isBefore = dropTarget && e.clientY < rect.top + rect.height / 2;
 
-                        if (dropTarget && dropTarget.classList.contains('link-card')) {
-                            if (isBefore) {
-                                dropContainer.insertBefore(draggedItem, dropTarget);
-                            } else {
-                                dropContainer.insertBefore(draggedItem, dropTarget.nextSibling);
-                            }
+                        if (dropTarget && dropTarget.classList.contains('link-card') && dropTarget.parentNode === dropContainer) {
+                            dropContainer.insertBefore(draggedItem, isBefore ? dropTarget : dropTarget.nextSibling || null);
                         } else {
                             dropContainer.appendChild(draggedItem);
                         }
@@ -1309,6 +1448,7 @@
                         placeholder.remove();
                         placeholder = null;
                     }
+                    draggedItem = null;
                     updateArrowStates();
                 });
             });
