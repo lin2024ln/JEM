@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -103,6 +104,7 @@
             overflow-y: auto;
             z-index: 15;
             padding: 20px;
+            text-align: left;
         }
         .side-menu.active {
             display: block;
@@ -136,6 +138,27 @@
             font-size: 1.1rem;
             color: var(--primary);
         }
+        .side-menu-back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            margin-bottom: 18px;
+            background: var(--glass-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .side-menu-back-btn:hover {
+            background: rgba(52, 152, 219, 0.13);
+            color: var(--secondary);
+        }
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -151,6 +174,7 @@
             background: var(--card-bg);
             padding: 5px;
             border: 2px solid var(--border);
+            flex-wrap: nowrap;
         }
         .main-tab {
             flex: 1;
@@ -175,6 +199,40 @@
         }
         .main-tab:hover:not(.active) {
             background: rgba(52, 152, 219, 0.1);
+            color: var(--primary);
+        }
+        .workspace-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 20px 0 30px 0;
+            position: sticky;
+            top: 80px;
+            z-index: 5;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 8px;
+            box-shadow: var(--glass-shadow);
+        }
+        .workspace-tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.3s ease;
+            border-radius: 16px;
+        }
+        .workspace-tab.active {
+            background: rgba(255, 255, 255, 0.3);
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .workspace-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
             color: var(--primary);
         }
         .filter-section {
@@ -371,6 +429,8 @@
         }
         .content-area { display: none; }
         .content-area.active { display: block; }
+        .workspace-content-area { display: none; }
+        .workspace-content-area.active { display: block; }
         .section-title {
             font-size: 2rem;
             margin: 40px 0 24px 0;
@@ -544,13 +604,13 @@
             .link-card { padding: 18px 8px 16px 8px; }
             .filter-buttons { gap: 6px; }
             .filter-btn { padding: 6px 10px; font-size: 0.85rem; }
-            .main-tabs { flex-direction: column; gap: 6px; }
-            .main-tab { max-width: none; padding: 8px 16px; font-size: 0.9rem; }
+            .main-tabs { flex-direction: row; flex-wrap: nowrap; gap: 2px; }
+            .main-tab { max-width: none; padding: 8px 8px; font-size: 0.9rem; }
             .drag-controls { top: 5px; right: 5px; }
             .drag-arrow { padding: 4px 8px; font-size: 0.8rem; }
             .side-menu { width: 80%; left: 10%; top: 100px; }
-            .browse-tabs { flex-direction: column; gap: 6px; padding: 6px; }
-            .browse-tab { padding: 8px 16px; font-size: 0.9rem; }
+            .browse-tabs, .workspace-tabs { flex-direction: row; gap: 4px; padding: 6px; }
+            .browse-tab, .workspace-tab { padding: 8px 8px; font-size: 0.9rem; }
             .iframe-container { height: calc(100vh - 250px); }
             .iframe-controls { top: 5px; right: 5px; }
             .iframe-control-btn { padding: 6px; font-size: 0.9rem; }
@@ -570,6 +630,9 @@
             <img src="https://jemcentral.org/wp-content/uploads/2018/11/jem-logo.gif" alt="JEM Logo" class="header-logo">
         </header>
         <div class="side-menu" id="sideMenu">
+            <button class="side-menu-back-btn" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
             <!-- Dynamically populated -->
         </div>
         <div class="container">
@@ -729,6 +792,14 @@
                             <i class="fas fa-external-link-alt"></i> Open Tagging Tool
                         </a>
                     </div>
+                    <div class="link-card draggable" data-category="public tools">
+                        <div class="link-icon"><i class="fas fa-tasks"></i></div>
+                        <div class="link-title">Monday.com</div>
+                        <div class="link-desc">JEM's Monday.com workspace</div>
+                        <a class="link-btn" href="https://jemedia.monday.com/" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Open Monday.com
+                        </a>
+                    </div>
                     <div class="link-card draggable" data-category="server tools">
                         <div class="link-icon"><i class="fas fa-signature"></i></div>
                         <div class="link-title">Sign URL</div>
@@ -796,20 +867,35 @@
                 <div class="links-grid" data-section-id="projects"></div>
             </div>
             <div id="workspaceContent" class="content-area">
-                <div class="workspace-section">
-                    <div class="workspace-header">
-                        <h3 class="workspace-title">Workspace</h3>
-                        <div>
-                            <button id="manageDashboardBtn" class="link-btn">
-                                <i class="fas fa-cog"></i> Manage Sections
-                            </button>
-                            <button id="addProjectBtn" class="link-btn">
-                                <i class="fas fa-plus"></i> Add Project
-                            </button>
+                <div class="workspace-tabs">
+                    <button class="workspace-tab active" onclick="switchWorkspaceTab('monday')"><i class="fas fa-tasks"></i> Monday</button>
+                    <button class="workspace-tab" onclick="switchWorkspaceTab('projects')"><i class="fas fa-project-diagram"></i> Projects</button>
+                </div>
+                <div id="workspaceMonday" class="workspace-content-area active">
+                    <div class="iframe-container" id="mondayIframeContainer">
+                        <div class="iframe-controls">
+                            <button class="iframe-control-btn" onclick="goBackMondayIframe()"><i class="fas fa-arrow-left"></i></button>
+                            <button class="iframe-control-btn" onclick="toggleMondayFullscreen()"><i class="fas fa-expand"></i></button>
                         </div>
+                        <iframe id="mondayIframe" src="https://jemedia.monday.com/" frameborder="0"></iframe>
                     </div>
-                    <p class="drag-note">Drag sections/cards or use arrows to reorder, like in Monday.com</p>
-                    <div id="workspaceDashboardContainer" class="workspace-dashboard"></div>
+                </div>
+                <div id="workspaceProjects" class="workspace-content-area">
+                    <div class="workspace-section">
+                        <div class="workspace-header">
+                            <h3 class="workspace-title">Workspace</h3>
+                            <div>
+                                <button id="manageDashboardBtn" class="link-btn">
+                                    <i class="fas fa-cog"></i> Manage Sections
+                                </button>
+                                <button id="addProjectBtn" class="link-btn">
+                                    <i class="fas fa-plus"></i> Add Project
+                                </button>
+                            </div>
+                        </div>
+                        <p class="drag-note">Drag sections/cards or use arrows to reorder, like in Monday.com</p>
+                        <div id="workspaceDashboardContainer" class="workspace-dashboard"></div>
+                    </div>
                 </div>
             </div>
             <div id="browseContent" class="content-area">
@@ -868,6 +954,7 @@
         </div>
     </div>
     <script>
+        // --- DATA ---
         const ALL_LINKS = [
             { title: 'jem.tv', url: 'https://videos.jem.tv', icon: 'fa-video', category: 'public video' },
             { title: 'VMS', url: 'https://vms.jemedia.com', icon: 'fa-server', category: 'server video' },
@@ -884,6 +971,7 @@
             { title: 'Serial Number POC', url: 'https://rebbephoto.com/serial-number-poc', icon: 'fa-id-card', category: 'public tools' },
             { title: 'Generate CSV', url: 'https://jemcentral.org/test/jsonCsv.html', icon: 'fa-file-csv', category: 'public tools' },
             { title: 'Tagging Tool', url: 'https://jem-tagging.web.app', icon: 'fa-tags', category: 'public tools' },
+            { title: 'Monday.com', url: 'https://jemedia.monday.com/', icon: 'fa-tasks', category: 'public tools' },
             { title: 'Sign URL', url: 'https://ccdb-admin-prod.firebaseapp.com/sign-url', icon: 'fa-signature', category: 'server tools' },
             { title: 'Search Faces', url: 'https://ccdb.jemedia.com/migration/face-recognition/search', icon: 'fa-user-friends', category: 'server media tools' },
             { title: 'Clockin', url: 'https://app.clockify.me', icon: 'fa-clock', category: 'public outside' },
@@ -905,6 +993,7 @@
             { title: 'Projects', id: 'projects', icon: 'fa-project-diagram' }
         ];
 
+        // --- LOGIN ---
         function checkCode() {
             const code = document.getElementById('code').value;
             if (code === 'toplevel') {
@@ -915,6 +1004,7 @@
             }
         }
 
+        // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             initSideMenu();
             initWorkspaceDashboard();
@@ -924,11 +1014,20 @@
             updateProjectsSection();
             initDragAndDrop();
             updateArrowStates();
+            // Workspace sub-tabs
+            window.currentWorkspaceTab = 'monday';
+            switchWorkspaceTab('monday');
         });
 
+        // --- SIDE MENU ---
         function initSideMenu() {
             const sideMenu = document.getElementById('sideMenu');
-            sideMenu.innerHTML = '';
+            // Keep the back button at the top
+            sideMenu.innerHTML = `
+                <button class="side-menu-back-btn" onclick="history.back()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+            `;
             ALL_SECTIONS.forEach(section => {
                 const sectionLinks = ALL_LINKS.filter(link => link.category.includes(section.id));
                 if (sectionLinks.length > 0) {
@@ -954,6 +1053,7 @@
             sideMenu.classList.toggle('active');
         }
 
+        // --- MAIN TABS ---
         function switchMainTab(tab) {
             const tabs = document.querySelectorAll('.main-tab');
             const contents = document.querySelectorAll('.content-area');
@@ -962,9 +1062,25 @@
             const activeTab = document.querySelector(`[onclick="switchMainTab('${tab}')"]`);
             if (activeTab) activeTab.classList.add('active');
             document.getElementById(tab === 'all' ? 'allContent' : tab === 'workspace' ? 'workspaceContent' : 'browseContent').classList.add('active');
+            if (tab === 'workspace') {
+                switchWorkspaceTab(window.currentWorkspaceTab || 'monday');
+            }
             updateArrowStates();
         }
 
+        // --- WORKSPACE SUB-TABS ---
+        function switchWorkspaceTab(tab) {
+            window.currentWorkspaceTab = tab;
+            const tabs = document.querySelectorAll('.workspace-tab');
+            const contents = document.querySelectorAll('.workspace-content-area');
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+            const activeTab = document.querySelector(`[onclick="switchWorkspaceTab('${tab}')"]`);
+            if (activeTab) activeTab.classList.add('active');
+            document.getElementById(tab === 'monday' ? 'workspaceMonday' : 'workspaceProjects').classList.add('active');
+        }
+
+        // --- BROWSE TABS ---
         function switchBrowseTab(tab) {
             const tabs = document.querySelectorAll('.browse-tab');
             tabs.forEach(t => t.classList.remove('active'));
@@ -1004,6 +1120,31 @@
             }
         }
 
+        // --- MONDAY IFRAME CONTROLS ---
+        function goBackMondayIframe() {
+            const iframe = document.getElementById('mondayIframe');
+            if (iframe.contentWindow) {
+                iframe.contentWindow.history.back();
+            }
+        }
+        function toggleMondayFullscreen() {
+            const iframeContainer = document.getElementById('mondayIframeContainer');
+            const iframe = document.getElementById('mondayIframe');
+            const fullscreenBtn = iframeContainer.querySelector('.iframe-control-btn i.fa-expand, .iframe-control-btn i.fa-compress');
+            if (iframeContainer.classList.contains('fullscreen')) {
+                iframeContainer.classList.remove('fullscreen');
+                iframe.style.height = 'calc(100vh - 200px)';
+                fullscreenBtn.classList.remove('fa-compress');
+                fullscreenBtn.classList.add('fa-expand');
+            } else {
+                iframeContainer.classList.add('fullscreen');
+                iframe.style.height = '100vh';
+                fullscreenBtn.classList.remove('fa-expand');
+                fullscreenBtn.classList.add('fa-compress');
+            }
+        }
+
+        // --- FILTER LINKS ---
         function filterLinks(category) {
             const cards = document.querySelectorAll('#allContent .link-card');
             const sections = document.querySelectorAll('#allContent .section-title, #allContent .links-grid');
@@ -1040,6 +1181,7 @@
             updateArrowStates();
         }
 
+        // --- WORKSPACE DASHBOARD ---
         function initWorkspaceDashboard() {
             if (localStorage.getItem('workspaceDashboardSections') === null) {
                 const allSectionIds = ALL_SECTIONS.map(s => s.id);
@@ -1215,8 +1357,10 @@
             updateArrowStates();
         }
 
+        // --- FIXED: UP/DOWN BUTTONS LOGIC ---
         function updateArrowStates() {
             const workspaceContainer = document.getElementById('workspaceDashboardContainer');
+            if (!workspaceContainer) return;
             const sections = Array.from(workspaceContainer.querySelectorAll('.draggable-section'));
             sections.forEach((section, index) => {
                 const upArrow = section.querySelector('.section-drag-controls .drag-arrow[onclick*="up"]');
@@ -1255,40 +1399,49 @@
             const items = Array.from(container.querySelectorAll('.draggable-section, .link-card'));
             const index = items.indexOf(item);
 
+            // Section reordering (Workspace)
             if (item.classList.contains('draggable-section')) {
+                const savedSections = JSON.parse(localStorage.getItem('workspaceDashboardSections') || '[]');
                 if (direction === 'up' && index > 0) {
-                    const prevItem = items[index - 1];
-                    if (prevItem && prevItem.parentNode === container) {
-                        container.insertBefore(item, prevItem);
-                        updateSectionOrder(index, index - 1);
-                    }
+                    // Swap in DOM
+                    container.insertBefore(item, items[index - 1]);
+                    // Swap in localStorage
+                    [savedSections[index - 1], savedSections[index]] = [savedSections[index], savedSections[index - 1]];
+                    localStorage.setItem('workspaceDashboardSections', JSON.stringify(savedSections));
                 } else if (direction === 'down' && index < items.length - 1) {
-                    const nextItem = items[index + 1];
-                    if (nextItem && nextItem.parentNode === container) {
-                        container.insertBefore(item, nextItem.nextSibling || null);
-                        updateSectionOrder(index, index + 1);
+                    // Move after next
+                    if (items[index + 1].nextSibling) {
+                        container.insertBefore(item, items[index + 1].nextSibling);
+                    } else {
+                        container.appendChild(item);
                     }
+                    // Swap in localStorage
+                    [savedSections[index], savedSections[index + 1]] = [savedSections[index + 1], savedSections[index]];
+                    localStorage.setItem('workspaceDashboardSections', JSON.stringify(savedSections));
                 }
-            } else if (item.classList.contains('link-card')) {
+                renderWorkspaceDashboard();
+                updateArrowStates();
+                return;
+            }
+
+            // Card reordering (Projects)
+            if (item.classList.contains('link-card')) {
                 const sectionGrid = item.closest('.links-grid');
                 if (!sectionGrid) return;
                 const cards = Array.from(sectionGrid.querySelectorAll('.link-card'));
                 const cardIndex = cards.indexOf(item);
                 if (direction === 'left' && cardIndex > 0) {
-                    const prevCard = cards[cardIndex - 1];
-                    if (prevCard && prevCard.parentNode === sectionGrid) {
-                        sectionGrid.insertBefore(item, prevCard);
-                        updateCardOrder(sectionGrid, cardIndex, cardIndex - 1);
-                    }
+                    sectionGrid.insertBefore(item, cards[cardIndex - 1]);
+                    updateCardOrder(sectionGrid, cardIndex, cardIndex - 1);
                 } else if (direction === 'right' && cardIndex < cards.length - 1) {
-                    const nextCard = cards[cardIndex + 1];
-                    if (nextCard && nextCard.parentNode === sectionGrid) {
-                        sectionGrid.insertBefore(item, nextCard.nextSibling || null);
-                        updateCardOrder(sectionGrid, cardIndex, cardIndex + 1);
+                    if (cards[cardIndex + 1].nextSibling) {
+                        sectionGrid.insertBefore(item, cards[cardIndex + 1].nextSibling);
+                    } else {
+                        sectionGrid.appendChild(item);
                     }
+                    updateCardOrder(sectionGrid, cardIndex, cardIndex + 1);
                 }
             }
-
             updateArrowStates();
         }
 
@@ -1306,7 +1459,10 @@
         function updateCardOrder(sectionGrid, oldIndex, newIndex) {
             if (sectionGrid.dataset.sectionId === 'projects') {
                 const projects = JSON.parse(localStorage.getItem('userProjects') || '[]');
-                const projectIndex = parseInt(sectionGrid.querySelector('.link-card').dataset.projectIndex);
+                // Find which project this card belongs to
+                const card = sectionGrid.querySelectorAll('.link-card')[newIndex];
+                const projectIndex = parseInt(card.dataset.projectIndex);
+                const linkIndex = parseInt(card.dataset.linkIndex);
                 const link = projects[projectIndex].urls[oldIndex];
                 projects[projectIndex].urls.splice(oldIndex, 1);
                 projects[projectIndex].urls.splice(newIndex, 0, link);
@@ -1315,6 +1471,7 @@
             }
         }
 
+        // --- DRAG AND DROP ---
         function initDragAndDrop() {
             const containers = document.querySelectorAll('.links-grid, #workspaceDashboardContainer');
             let draggedItem = null;
@@ -1413,7 +1570,8 @@
                         const rect = dropTarget?.getBoundingClientRect();
                         const isBefore = dropTarget && e.clientY < rect.top + rect.height / 2;
 
-                        if (dropTarget && dropTarget.classList.contains('link-card') && dropTarget.parentNode === dropContainer) {
+                        if (dropTarget && dropTarget.classList
+                        .contains('link-card') && dropTarget.parentNode === dropContainer) {
                             dropContainer.insertBefore(draggedItem, isBefore ? dropTarget : dropTarget.nextSibling || null);
                         } else {
                             dropContainer.appendChild(draggedItem);
@@ -1456,4 +1614,3 @@
     </script>
 </body>
 </html>
-
